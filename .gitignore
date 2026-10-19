@@ -1,0 +1,9 @@
+dist/
+web/node_modules/
+internal/webui/dist/
+*.syso
+*.log
+data/
+.env
+playwright-report/
+test-results/

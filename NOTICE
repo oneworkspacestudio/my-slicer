@@ -1,0 +1,12 @@
+My Slicer — One Workspace Studio
+Copyright 2026 One Workspace Studio contributors.
+Licensed under AGPL-3.0; see LICENSE.
+
+Uses the unmodified, separately downloaded official Bambu Studio engine and
+release-matched resources. Bambu Studio is Copyright Bambu Lab and contributors,
+AGPL-3.0. Source: https://github.com/bambulab/BambuStudio
+This application is an independent project, not an official Bambu Lab product.
+No proprietary Bambu networking plugin is included or used.
+
+Shared application host and UI foundation originate in One Workspace Studio's
+one-workspace and my-tasks projects; retain their distribution notices.
