@@ -164,3 +164,38 @@ workflow regression is required before packaging. Added per-dispatch locks and
 explicit pre-start upload cancellation; durable cancellation is checked under the
 same lock as one start publish, so cancelling an upload cannot later start it.
 Standalone main now reports only actual errors, avoiding inherited Report(nil).
+
+Final acceptance supersedes the earlier pending-work notes: source3812e90 fixes
+zero-normal STL preview lighting; v0.1.0-preview.1 published with11 assets, each
+remote size/SHA verified. Org ZIP hash1f431ec7b893a6591eaf067f10ef8145f5012e158e6b81d2e0ce66e814f4890e.
+Actual native HTTP both-model/3MF-roundtrip tests repeated successfully. App Go
+tests/vet and TLS/FTPS fixtures passed; govulncheck found no reachable/imported
+package findings (eight unused-module findings, no independent audit claim).
+Managed browser acceptance: one MyAccounts login, Drive auto connection/source
+copy, numbered duplicates/import, real official engine download and50-layer
+slice, sliced Drive archive matching SHA, shared sign-out invalidates session.
+Final99-package Workspace42 bundle and actual old41 synthetic update verified.
+Owner subsequently upgraded41->42 preserving identity/paths/origin;20 apps and
+Slicer running, existing remote launch reaches normal sign-in. Workspace42 public
+installer/bundle uploads were still completing at this handoff; inspect its org
+release before claiming publication. No physical printer setup/start tested.
+
+Native execution currently normalizes by-layer sequence, linear moves (arcs off)
+and the selected physical plate. Original native archive remains intact; desktop
+Bambu Studio required for execution modes outside this preview. Release notes
+and acceptance docs disclose limits. Never certify arbitrary desktop painting/
+modifier projects or physical AMS correctness from software fixtures.
+
+All task fixture managers/children stopped; exact synthetic C fixture root deleted
+after process/reparse verification (30036 files/4012540546 bytes). Owner installation
+and newest recovery retained; source/artifacts/receipts remain onI. Do not recreate
+disposable fixtures or rerun owner update merely for publication. User must enter
+both printers' private details in app and explicitly initiate any physical Print.
+
+Workspace42 publication subsequently completed with26 verified asset sizes/SHA
+digests, public tag source5ebc588; no Actions. Owner's installed manager/Slicer
+hashes match that published payload,20 apps healthy and existing tunnel restored.
+https://github.com/oneworkspacestudio/one-workspace/releases/tag/v0.3.0-preview.42
+Initial owner outage was stopped manager/tunnel with stale ready markers; sampled
+crash/Defender events did not establish exit cause. Do not conflate health checks
+with physical printer, end-to-end mail delivery or unlocked-vault acceptance.
