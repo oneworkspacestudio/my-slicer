@@ -154,3 +154,13 @@ app build contract at9012 /slicer, checked org installer dependency on accounts+
 Still finish app source commit/build/release and public org component pin, then
 verified full Workspace42 package, isolated managed SSO/Drive/upgrade tests, source
 push/release, authorized owner upgrade and tunnel check. Do not certify hardware.
+
+Release repetition exposed native Windows post-export cleanup retaining a process/
+output handle despite a final success receipt and complete archive. Run now bounds
+pipe cleanup and, after the actual return_code0 receipt plus archive and a3s grace,
+ends only its own Windows job, then still validates all output metadata/toolpaths.
+Do not infer completion from Gcode existence alone. Repeated real native HTTP
+workflow regression is required before packaging. Added per-dispatch locks and
+explicit pre-start upload cancellation; durable cancellation is checked under the
+same lock as one start publish, so cancelling an upload cannot later start it.
+Standalone main now reports only actual errors, avoiding inherited Report(nil).

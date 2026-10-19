@@ -152,6 +152,32 @@ func TestDurablePrintMerge(t *testing.T) {
 		t.Fatal("terminal state overwritten")
 	}
 }
+func TestCancelUploadCannotPublishStart(t *testing.T) {
+	f := setup(t)
+	p := Print{ID: apphost.ID(), State: "uploading"}
+	_, e := f.h.DB.Exec("INSERT INTO slicer_prints VALUES(?,?,?,?,?,?,?,?,?,?)", p.ID, f.session.User.ID, "printer", "slice", "physical", "confirmation", "hash", p.State, encode(p), now())
+	if e != nil {
+		t.Fatal(e)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	f.a.printCancels.Store(p.ID, context.CancelFunc(cancel))
+	w := f.call("POST", "/api/prints/"+p.ID+"/cancel", map[string]bool{"confirm": true}, nil)
+	if w.Code != 202 {
+		t.Fatal(w.Code, w.Body.String())
+	}
+	if ctx.Err() == nil {
+		t.Fatal("upload was not cancelled")
+	}
+	if sent, e := f.a.beginStart(context.Background(), f.session.User.ID, &p, nil); sent || e != nil {
+		t.Fatal("cancelled upload was eligible for start", sent, e)
+	}
+	f.a.storePrint(f.session.User.ID, p)
+	got, _ := f.a.getPrint(f.session.User.ID, p.ID)
+	if got.State != "cancelled" {
+		t.Fatal("late upload callback overwrote cancellation")
+	}
+}
 func TestRealNativeHTTPWorkflow(t *testing.T) {
 	archive := os.Getenv("MYSLICER_TEST_ENGINE_ARCHIVE")
 	if archive == "" {

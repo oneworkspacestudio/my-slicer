@@ -16,17 +16,18 @@ import (
 )
 
 type App struct {
-	H           *apphost.Host
-	Engine      *engine.Manager
-	mu          sync.Mutex
-	storageMu   sync.Mutex
-	printMu     sync.Mutex
-	ctx         context.Context
-	cancelSlice map[string]context.CancelFunc
-	devicesMu   sync.Mutex
-	devices     map[string]*Device
-	trust       map[string]Trust
-	wg          sync.WaitGroup
+	H            *apphost.Host
+	Engine       *engine.Manager
+	mu           sync.Mutex
+	storageMu    sync.Mutex
+	printLocks   sync.Map
+	printCancels sync.Map
+	ctx          context.Context
+	cancelSlice  map[string]context.CancelFunc
+	devicesMu    sync.Mutex
+	devices      map[string]*Device
+	trust        map[string]Trust
+	wg           sync.WaitGroup
 }
 type Trust struct {
 	Printer  string

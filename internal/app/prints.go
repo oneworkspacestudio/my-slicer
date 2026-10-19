@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"github.com/oneworkspacestudio/my-slicer/internal/printer"
 	"github.com/oneworkspacestudio/one-workspace/pkg/apphost"
 	"io"
@@ -16,6 +17,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -55,9 +57,14 @@ func (a *App) getPrint(user, id string) (Print, error) {
 	e = json.Unmarshal([]byte(raw), &p)
 	return p, e
 }
+func (a *App) printLock(id string) *sync.Mutex {
+	m, _ := a.printLocks.LoadOrStore(id, &sync.Mutex{})
+	return m.(*sync.Mutex)
+}
 func (a *App) storePrint(user string, p Print) error {
-	a.printMu.Lock()
-	defer a.printMu.Unlock()
+	lock := a.printLock(p.ID)
+	lock.Lock()
+	defer lock.Unlock()
 	old, err := a.getPrint(user, p.ID)
 	if err != nil {
 		return err
@@ -193,6 +200,8 @@ func (a *App) dispatch(parent context.Context, user string, p Print, expectedSHA
 	defer a.H.Freeze.RUnlock()
 	ctx, cancel := context.WithTimeout(parent, 40*time.Minute)
 	defer cancel()
+	a.printCancels.Store(p.ID, cancel)
+	defer a.printCancels.Delete(p.ID)
 	fail := func(message string) { p.State = "failed"; p.Message = message; _ = a.storePrint(user, p) }
 	client, e := a.liveClient(user, p.PrinterID)
 	if e != nil {
@@ -236,21 +245,51 @@ func (a *App) dispatch(parent context.Context, user string, p Print, expectedSHA
 	}
 	// Commit uncertainty before the one and only start publish. A crash, timeout or
 	// disconnect from this point can never cause an automatic second start.
-	p.State = "requesting_start"
-	p.Message = "Upload verified. Requesting this exact print once"
-	p.RequestedAt = now()
-	if e = a.storePrint(user, p); e != nil {
+	sent, e := a.beginStart(ctx, user, &p, client)
+	if !sent {
+		if e != nil {
+			fail(e.Error())
+		}
 		return
 	}
-	if e = client.Start(p.Spec, p.Options); e != nil {
+	if e != nil {
 		p.State = "state_unknown"
-		p.Message = "Start outcome is unknown. Reconnect and inspect the real printer before any retry; no start command is resent"
+		p.Message = "Start outcome is unknown. Reconnect and inspect the physical printer; no start is resent"
 		_ = a.storePrint(user, p)
 		return
 	}
+
 	p.State = "awaiting_printer"
 	p.Message = "Start requested; waiting for matching printer-reported preparation/printing"
 	_ = a.storePrint(user, p)
+}
+func (a *App) beginStart(ctx context.Context, user string, p *Print, client *printer.Client) (bool, error) {
+	lock := a.printLock(p.ID)
+	lock.Lock()
+	defer lock.Unlock()
+	old, e := a.getPrint(user, p.ID)
+	if e != nil {
+		return false, e
+	}
+	if old.State == "cancelled" || old.CancelRequested {
+		return false, nil
+	}
+	if old.State != "uploading" {
+		return false, errors.New("This dispatch is no longer eligible for a start; inspect its current state")
+	}
+	if e = ctx.Err(); e != nil {
+		return false, e
+	}
+	p.State = "requesting_start"
+	p.Message = "Upload verified. Requesting this exact print once"
+	p.RequestedAt = now()
+	p.Updated = now()
+	if _, e = a.H.DB.Exec("UPDATE slicer_prints SET state=?,data=? WHERE id=? AND user_id=?", p.State, encode(p), p.ID, user); e != nil {
+		return false, e
+	}
+	// Cancel-before-start and this publish share only this dispatch's lock. Other
+	// printers and their status/controls remain independent.
+	return true, client.Start(p.Spec, p.Options)
 }
 func (a *App) controlPrint(w http.ResponseWriter, r *http.Request) {
 	var body struct {
@@ -268,6 +307,30 @@ func (a *App) controlPrint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	action := filepath.Base(r.URL.Path)
+	if action == "cancel" && body.Confirm {
+		lock := a.printLock(p.ID)
+		lock.Lock()
+		current, err := a.getPrint(user, p.ID)
+		if err == nil && (current.State == "validating" || current.State == "uploading") {
+			current.State = "cancelled"
+			current.CancelRequested = true
+			current.Message = "Cancelled before any print start was requested"
+			current.Updated = now()
+			_, err = a.H.DB.Exec("UPDATE slicer_prints SET state=?,data=? WHERE id=? AND user_id=?", current.State, encode(current), current.ID, user)
+			lock.Unlock()
+			if err != nil {
+				a.H.DBError(w, err)
+				return
+			}
+			if c, ok := a.printCancels.Load(p.ID); ok {
+				c.(context.CancelFunc)()
+			}
+			apphost.JSON(w, 202, current)
+			return
+		}
+		lock.Unlock()
+		p = current
+	}
 	client, e := a.liveClient(user, p.PrinterID)
 	if e != nil {
 		a.problem(w, e)

@@ -4,6 +4,7 @@ package engine
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"golang.org/x/sys/windows"
 	"io"
@@ -11,6 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"syscall"
+	"time"
 	"unsafe"
 )
 
@@ -33,6 +35,9 @@ func Run(ctx context.Context, exe, dir string, args []string, out io.Writer) err
 		return e
 	}
 	cmd := exec.Command(exe, args...)
+	// Bound inherited output-pipe cleanup after the native process exits. A
+	// helper retaining a pipe must not leave a valid completed slice waiting.
+	cmd.WaitDelay = 2 * time.Second
 	cmd.Dir = dir
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: windows.CREATE_SUSPENDED | windows.CREATE_NO_WINDOW}
 	cmd.Stdout = out
@@ -79,12 +84,46 @@ func Run(ctx context.Context, exe, dir string, args []string, out io.Writer) err
 	}
 	done := make(chan error, 1)
 	go func() { done <- cmd.Wait() }()
-	select {
-	case e := <-done:
-		return e
-	case <-ctx.Done():
-		_ = windows.TerminateJobObject(job, 1)
-		<-done
-		return ctx.Err()
+	tick := time.NewTicker(500 * time.Millisecond)
+	defer tick.Stop()
+	var completed time.Time
+	for {
+		select {
+		case e := <-done:
+			if errors.Is(e, exec.ErrWaitDelay) && cmd.ProcessState != nil && cmd.ProcessState.Success() {
+				_ = windows.TerminateJobObject(job, 0)
+				return nil // Slice still verifies native archive/metadata/extrusions.
+			}
+			return e
+		case <-tick.C:
+			// Some Windows builds leave a native backup/cleanup thread running
+			// after the final success receipt. Bound that post-export cleanup.
+			// Never infer completion from a percentage or a G-code file alone.
+			if completed.IsZero() {
+				p := filepath.Join(dir, "result.json")
+				st, e := os.Stat(p)
+				if e == nil && st.Size() > 0 && st.Size() < 1<<20 {
+					b, e := os.ReadFile(p)
+					var receipt struct {
+						Code *int `json:"return_code"`
+					}
+					archive, e2 := os.Stat(filepath.Join(dir, "result.gcode.3mf"))
+					if e == nil && json.Unmarshal(b, &receipt) == nil && receipt.Code != nil && *receipt.Code == 0 && e2 == nil && archive.Size() > 0 {
+						completed = time.Now()
+					}
+				}
+			} else if time.Since(completed) > 3*time.Second {
+				_ = windows.TerminateJobObject(job, 0)
+				<-done
+				if ctx.Err() != nil {
+					return ctx.Err()
+				}
+				return nil
+			}
+		case <-ctx.Done():
+			_ = windows.TerminateJobObject(job, 1)
+			<-done
+			return ctx.Err()
+		}
 	}
 }
