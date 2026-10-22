@@ -433,10 +433,33 @@ func (a *App) modelFile(w http.ResponseWriter, r *http.Request) {
 	file := "original." + m.Kind
 	if strings.HasSuffix(r.URL.Path, "/mesh") {
 		if m.Kind != "stl" {
-			apphost.Problem(w, 409, "Native3MF layout is preserved. Slice the selected plate for its exact toolpath preview")
-			return
+			plate, err := strconv.Atoi(r.URL.Query().Get("plate"))
+			if err != nil || plate < 1 || plate > 100 {
+				apphost.Problem(w, 400, "Choose an imported plate to view")
+				return
+			}
+			file = fmt.Sprintf("preview-plate-%d.stl", plate)
+			cached := filepath.Join(a.H.Config.Data, "models", m.ID, file)
+			a.storageMu.Lock()
+			if _, err = os.Stat(cached); os.IsNotExist(err) {
+				var mesh model.Mesh
+				mesh, err = model.PreviewProject(filepath.Join(a.H.Config.Data, "models", m.ID, "original.3mf"), plate)
+				if err == nil {
+					err = os.WriteFile(cached+".tmp", mesh.Binary(100000), 0600)
+					if err == nil {
+						err = os.Rename(cached+".tmp", cached)
+					}
+				}
+			}
+			a.storageMu.Unlock()
+			if err != nil {
+				apphost.Problem(w, 422, "Could not display this plate. "+err.Error())
+				return
+			}
 		}
-		file = "preview.stl"
+		if m.Kind == "stl" {
+			file = "preview.stl"
+		}
 		w.Header().Set("Content-Type", "model/stl")
 	} else {
 		w.Header().Set("Content-Type", "application/octet-stream")

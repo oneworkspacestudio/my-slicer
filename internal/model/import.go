@@ -105,7 +105,7 @@ func emptyValue(v any) bool {
 	return false
 }
 func InspectProject(filename string) (ImportInfo, error) {
-	out := ImportInfo{Kind: "3mf", Plates: []Plate{}, Notice: "Original project, plate membership, painting and modifiers are preserved. Browser transforms are available for STL objects; use Slice to inspect the exact selected plate toolpath."}
+	out := ImportInfo{Kind: "3mf", Plates: []Plate{}, Notice: "Original project, plate membership, painting and modifiers are preserved. The plate shows a read-only geometry preview. Use Slice to inspect printed layers."}
 	z, files, e := OpenArchive(filename, 512<<20)
 	if e != nil {
 		return out, e

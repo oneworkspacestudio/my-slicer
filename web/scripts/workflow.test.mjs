@@ -94,6 +94,14 @@ try{
  await page.reload();await page.getByText('Unsaved plate · kept for you',{exact:true}).waitFor();
  const restored=(await api('/api/projects'))[0];assert.equal(restored.id,original.id);assert.equal(restored.objects[0].modelID,original.objects[0].modelID);
  proof.modelImportWithoutProjectAndReloadRestore=true;
+ await page.locator('canvas[data-models-ready="1"]').waitFor();
+ let failPreview=true;
+ await page.route('**/api/models/*/mesh*',async route=>{await new Promise(r=>setTimeout(r,1200));if(failPreview){failPreview=false;await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Preview temporarily unavailable. Try again.'})})}else await route.continue()});
+ await page.reload();await page.getByText('Loading cube.stl…',{exact:true}).waitFor();
+ await page.getByRole('button',{name:'Retry model preview',exact:true}).click();
+ await page.locator('canvas[data-models-ready="1"]').waitFor();await page.unroute('**/api/models/*/mesh*');
+ proof.delayedPreviewFeedbackAndRetryWithoutUpload=true;
+
  await page.getByRole('button',{name:'Save project…'}).click();
  await page.getByRole('dialog',{name:'Save project',exact:true}).waitFor();
  await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),0);
@@ -125,6 +133,7 @@ try{
   await page.getByLabel('Add model',{exact:true}).setInputFiles({name:'native-cube.3mf',mimeType:'application/octet-stream',buffer:source});
   await waitUntil(async()=>{const plates=await api('/api/projects');return plates.length===2&&plates.some(v=>v.draft&&v.objects.length===1)});
   await page.getByRole('checkbox',{name:'Keep imported settings, modifiers and painting'}).waitFor();
+  await page.locator('canvas[data-models-ready="1"]').waitFor();proof.native3MFGeometryBeforeSlicing=true;
   await page.getByRole('link',{name:'Preview',exact:true}).click();
   await page.getByRole('heading',{name:'Your slice will appear here'}).waitFor();
   proof.native3MFOpensOwnPlateWithoutProjectAndClearsOldSlice=true;

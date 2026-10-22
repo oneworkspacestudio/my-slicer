@@ -5,7 +5,12 @@
 Entry: signed in, or return from preview/projects. Show Add model and Open from
 Drive first, optional Save project and New plate secondary. Empty state explains
 STL/3MF, with a visible plate rather than a project creation gate. Imported state
-shows object list and compact arrange/duplicate/remove/undo actions. Numeric
+shows the actual STL or read-only 3MF geometry, automatically framed around the
+model. Upload and preview loading messages stay beside the plate; a wire outline
+marks STL bounds during transfer. Failure offers Retry model preview without a
+new upload. Mesh decoding runs off the UI thread. Existing 3MF imports receive
+read-only previews on demand. Selected native plate filters saved build instances.
+Imported state also shows object list and compact arrange/duplicate/remove/undo actions. Numeric
 transforms and advanced slice settings expand on demand. The settings rail shows
 model/printer, material and quality, with Slice plate as its primary action.
 Engine missing/downloading/failed states appear in the rail without pushing import

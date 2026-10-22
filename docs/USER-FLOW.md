@@ -2,6 +2,9 @@
 
 1. Open **Prepare** and choose **Add model**, or **Open from Drive** in Workspace.
    Choose an STL or Bambu 3MF. There is no project form to complete first.
+   The model appears on the plate before slicing. While it loads, a message shows
+   what is happening. If the preview fails, choose **Retry model preview**.
+   Imported 3MF layouts are shown as saved; their original print settings are kept.
 2. Choose your printer model, material and quality. Add or arrange the objects on
    the plate. Position, scale and advanced settings open only when you need them.
    If prompted, install the slicing engine once; you can add models while it runs.

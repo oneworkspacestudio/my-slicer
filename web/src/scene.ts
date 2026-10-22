@@ -1,11 +1,13 @@
 import React,{useEffect,useRef,useState} from 'react';
 import * as T from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {STLLoader} from 'three/addons/loaders/STLLoader.js';
+import {SceneStatus} from './generated/SceneStatus';
 
 const colors=['#94a3b8','#1a73e8','#188038','#f9ab00','#a142f4','#e8710a','#12b5cb','#d93025'];
-export function Scene({project,models,layer,feature,request,onSelect}:any){
- const host=useRef<HTMLDivElement>(null),[error,setError]=useState('');
+export function Scene({project,models,layer,feature,request,onSelect,uploading}:any){
+ const host=useRef<HTMLDivElement>(null),[error,setError]=useState(''),[loading,setLoading]=useState(''),[attempt,setAttempt]=useState(0);
+ const cache=useRef(new Map<string,ArrayBuffer>());
+ const modelKey=(project.objects||[]).map((o:any)=>models.find((m:any)=>m.id===o.modelID)?.id||'pending').join(',');
  useEffect(()=>{const el=host.current!;let alive=true;let renderer:T.WebGLRenderer;
   try{renderer=new T.WebGLRenderer({antialias:true,alpha:false});}catch{setError('WebGL is unavailable. Enable hardware acceleration in your browser to inspect the plate. Native slicing and archive downloads remain available.');return}
   setError('');renderer.setPixelRatio(Math.min(devicePixelRatio,2));el.append(renderer.domElement);renderer.domElement.setAttribute('aria-label','Interactive build plate; drag to orbit, scroll to zoom, click an object to select');
@@ -16,15 +18,33 @@ export function Scene({project,models,layer,feature,request,onSelect}:any){
   const plate=new T.Mesh(new T.PlaneGeometry(w,w),new T.MeshStandardMaterial({color:0xdbe7f5,side:T.DoubleSide,roughness:1}));plate.position.set(w/2,w/2,-.1);scene.add(plate);
   const grid=new T.GridHelper(w,w/10,0x8ba7c6,0xb9cadf);grid.rotation.x=Math.PI/2;grid.position.set(w/2,w/2,0);scene.add(grid);
   const border=new T.LineLoop(new T.BufferGeometry().setFromPoints([new T.Vector3(0,0,.1),new T.Vector3(w,0,.1),new T.Vector3(w,w,.1),new T.Vector3(0,w,.1)]),new T.LineBasicMaterial({color:0x1a73e8}));scene.add(border);
-  const selectables:T.Object3D[]=[];
+  const selectables:T.Object3D[]=[];const workers:Worker[]=[];let pending=0;setLoading('');
+ const fit=()=>{const box=new T.Box3();for(const o of selectables)box.expandByObject(o);if(box.isEmpty())return;const center=box.getCenter(new T.Vector3()),size=box.getSize(new T.Vector3());controls.target.copy(center);const distance=Math.max(70,size.length()*1.8);camera.position.copy(center).add(new T.Vector3(1.1,-1,.85).normalize().multiplyScalar(distance));controls.update()};
   if(layer){const groups=new Map<number,number[]>();for(const s of layer.segments||[]){if(feature!=='all'&&Number(feature)!==s[6])continue;const arr=groups.get(s[6])||[];arr.push(...s.slice(0,6));groups.set(s[6],arr)}for(const[k,arr]of groups){const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(arr,3));scene.add(new T.LineSegments(g,new T.LineBasicMaterial({color:colors[k%colors.length]})))}}
-  else for(const o of project.objects||[]){const m=models.find((m:any)=>m.id===o.modelID);if(m?.kind!=='stl')continue;
-   request('/api/models/'+m.id+'/mesh').then(async(blob:Blob)=>{const buffer=await blob.arrayBuffer();if(!alive)return;const geometry=new STLLoader().parse(buffer);geometry.computeVertexNormals();const mesh=new T.Mesh(geometry,new T.MeshStandardMaterial({color:0x1a73e8,roughness:.65,metalness:.05,side:T.DoubleSide}));const t=o.transform;mesh.scale.setScalar(t.scale);mesh.rotation.order='ZYX';mesh.rotation.set(t.rx*Math.PI/180,t.ry*Math.PI/180,t.rz*Math.PI/180);mesh.position.set(t.x,t.y,t.z);mesh.userData.id=o.id;selectables.push(mesh);scene.add(mesh)}).catch((e:any)=>{if(alive)setError(e.message)})
+  else for(const o of project.objects||[]){const m=models.find((m:any)=>m.id===o.modelID);if(!m){setLoading('Preparing your model…');continue}
+   pending++;setLoading('Loading '+m.name+'…');
+   const url='/api/models/'+m.id+'/mesh'+(m.kind==='3mf'?'?plate='+(project.settings.nativePlate||1):'');
+   const getBuffer=async()=>{const saved=cache.current.get(url);if(saved)return saved.slice(0);const blob:Blob=await request(url);const buffer=await blob.arrayBuffer();if(alive){if(cache.current.size>=8)cache.current.delete(cache.current.keys().next().value!);cache.current.set(url,buffer.slice(0))}return buffer};
+   // A wire outline gives immediate spatial feedback while the real mesh loads.
+   const lo=m.min,hi=m.max;let outline:T.Mesh|undefined;
+   const place=(mesh:T.Object3D)=>{const t=o.transform;mesh.scale.setScalar(t.scale);mesh.rotation.order='ZYX';mesh.rotation.set(t.rx*Math.PI/180,t.ry*Math.PI/180,t.rz*Math.PI/180);mesh.position.set(t.x,t.y,t.z)};
+   if(m.kind==='stl'&&hi&&lo){outline=new T.Mesh(new T.BoxGeometry(hi[0]-lo[0],hi[1]-lo[1],hi[2]-lo[2]),new T.MeshBasicMaterial({color:0x1a73e8,wireframe:true,transparent:true,opacity:.35}));outline.geometry.translate((hi[0]+lo[0])/2,(hi[1]+lo[1])/2,(hi[2]+lo[2])/2);place(outline);scene.add(outline)}
+   getBuffer().then(buffer=>{if(!alive)return;
+    const worker=new Worker(new URL('./mesh.worker.ts',import.meta.url),{type:'module'});workers.push(worker);
+    const fail=(message:string)=>{if(!alive)return;setError(message);if(--pending===0)setLoading('');worker.terminate()};
+    worker.onerror=()=>fail('The model preview could not be drawn. Try loading it again.');
+    worker.onmessage=({data})=>{if(!alive)return;if(data.error){fail(data.error);return}
+     const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.BufferAttribute(data.positions,3));geometry.setAttribute('normal',new T.BufferAttribute(data.normals,3));
+     const mesh=new T.Mesh(geometry,new T.MeshStandardMaterial({color:0x1a73e8,roughness:.65,metalness:.05,side:T.DoubleSide}));place(mesh);mesh.userData.id=o.id;selectables.push(mesh);scene.add(mesh);
+     if(outline){scene.remove(outline);outline.geometry.dispose();(outline.material as T.Material).dispose()}
+     if(--pending===0){setLoading('');fit();renderer.domElement.dataset.modelsReady=String(selectables.length)}worker.terminate();
+    };worker.postMessage(buffer,[buffer]);
+   }).catch((e:any)=>{if(alive){setError(e.message||'The model preview could not be loaded.');if(--pending===0)setLoading('')}})
   }
   const ray=new T.Raycaster(),pointer=new T.Vector2();let down=[0,0];const start=(e:PointerEvent)=>{down=[e.clientX,e.clientY]};const click=(e:PointerEvent)=>{if(Math.hypot(e.clientX-down[0],e.clientY-down[1])>5)return;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);const hit=ray.intersectObjects(selectables)[0];if(hit)onSelect(hit.object.userData.id)};
   renderer.domElement.addEventListener('pointerdown',start);renderer.domElement.addEventListener('pointerup',click);
  const resize=()=>{const width=Math.max(1,el.clientWidth),height=Math.min(420,Math.max(240,width*.52));renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix()};const ro=new ResizeObserver(resize);ro.observe(el);resize();let frame=0;const draw=()=>{if(!alive)return;controls.update();renderer.render(scene,camera);frame=requestAnimationFrame(draw)};draw();
-  return()=>{alive=false;cancelAnimationFrame(frame);ro.disconnect();controls.dispose();scene.traverse((o:any)=>{o.geometry?.dispose();if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach((m:any)=>m.dispose())});renderer.dispose();renderer.domElement.remove()};
- },[project.id,project.revision,models.length,layer,feature]);
- return React.createElement('div',{className:'plate-scene'},React.createElement('div',{ref:host}),error&&React.createElement('p',{role:'alert'},error));
+  return()=>{alive=false;workers.forEach(w=>w.terminate());cancelAnimationFrame(frame);ro.disconnect();controls.dispose();scene.traverse((o:any)=>{o.geometry?.dispose();if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach((m:any)=>m.dispose())});renderer.dispose();renderer.domElement.remove()};
+ },[project.id,project.revision,project.settings.model,project.settings.nativePlate,modelKey,layer,feature,attempt]);
+ return React.createElement('div',{className:'plate-scene'},React.createElement('div',{ref:host}),React.createElement(SceneStatus,{data:{loading:uploading||loading,error,ready:!uploading&&!loading&&!error&&!!project.objects?.length},onAction:()=>setAttempt(a=>a+1)}));
 }
