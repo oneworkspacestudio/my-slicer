@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "appRelease": "https://github.com/oneworkspacestudio/my-slicer/releases/tag/v0.1.0-preview.4",
+  "workspaceRelease": "https://github.com/oneworkspacestudio/one-workspace/releases/tag/v0.3.0-preview.67",
+  "appSource": "9c9ea4cc5433ec52e66156ee4e7074791aa3af91",
+  "workspaceSource": "5feafa81149a469777ca629f5828ecaa28dd7ff2",
+  "allPublishedAssetHashesVerified": true,
+  "appAssetCount": 15,
+  "workspaceAssetCount": 27,
+  "native": {
+    "schema": 1,
+    "syntheticOnly": true,
+    "ownerDataUsedAsFixture": false,
+    "physicalPrintSent": false,
+    "realHardwareContacted": false,
+    "nativeModalUnavailable": true,
+    "addModelAboveFoldDesktopAndMobile": true,
+    "noProjectCreatedOnVisit": true,
+    "repeatedAddPrinterWithoutProjectOrNativeModal": true,
+    "realEncryptedPrinterSaveAndValidationRecovery": true,
+    "savedPrinterReopensAndCodeClears": true,
+    "modelImportWithoutProjectAndReloadRestore": true,
+    "delayedPreviewFeedbackAndRetryWithoutUpload": true,
+    "optionalProjectSaveAndFallbackModal": true,
+    "namedProjectAndNewPlatePreserveModels": true,
+    "realVerifiedEngineAndSlice": true,
+    "layers": 50,
+    "native3MFGeometryBeforeSlicing": true,
+    "native3MFOpensOwnPlateWithoutProjectAndClearsOldSlice": true,
+    "realNative3MFRoundTrip": true,
+    "browserErrors": []
+  },
+  "managed": {
+    "schema": 1,
+    "syntheticOnly": true,
+    "ownerDataUsedAsFixture": false,
+    "physicalPrintSent": false,
+    "realHardwareContacted": false,
+    "nativeHeaderAppsHidesFloatingLauncher": true,
+    "headerAppsWorksWithAndWithoutNativeDialogs": true,
+    "upgrade64To67PreservesExistingProjectPrinterFilesIdentity": true,
+    "exactPublishedSlicerBytes": true,
+    "singleMyAccountsLoginAndNoSecondAppLogin": true,
+    "managedImportWithoutProjectAndOrdinaryDriveCopies": true,
+    "managedPrinterSetupAndPhoneImportAboveFold": true,
+    "bothProvidedModelsRenderThroughWorkspaceProxyWithWorker": true,
+    "browserErrors": [],
+    "allThreeServicesHealthy": true
+  },
+  "models": {
+    "schema": 1,
+    "isolatedNativeWindows": true,
+    "ownerDataUsedAsFixture": false,
+    "physicalPrinterContacted": false,
+    "physicalPrintSent": false,
+    "bothProvidedModelsRenderedBeforeSlicing": true,
+    "delayedPreviewFeedbackAndRetryWithoutUpload": true,
+    "phoneNoOverflow": true,
+    "browserErrors": [],
+    "sourceModelsPublished": false,
+    "inputs": [
+      {
+        "kind": "3mf",
+        "size": 477135,
+        "sha256": "2286a6a0f391bb99cb2ae73d024536b941f9507dffe8cb5f862e2b9c18fb3059",
+        "triangles": 26964,
+        "rendered": true
+      },
+      {
+        "kind": "stl",
+        "size": 1333084,
+        "sha256": "d8c33e6fd3aec2a80dd9c50da73fd26b260cee1b7ef025d096728b1410aa1e0a",
+        "triangles": 26660,
+        "rendered": true
+      }
+    ]
+  },
+  "localDelivery": {
+    "schema": 1,
+    "workspace": "0.3.0-preview.67",
+    "slicer": "0.1.0-preview.4",
+    "normalBackedUpUpdater": true,
+    "apps": 25,
+    "healthyServices": 24,
+    "allHealthy": true,
+    "identityPathsPortsSelectionsPreserved": true,
+    "other24AppContractsAndPackagesPreserved": true,
+    "installedChatVersion": "0.1.0-preview.9",
+    "installedMailVersion": "0.1.0-preview.17",
+    "encryptedMailConfigurationUnchanged": true,
+    "rollbackVerified": true,
+    "rollbackManifestSHA256": "3da2d4a469e5fe8273488049b9463bdf773a38d97844844fca7b6c35c598aec0",
+    "managerSHA256": "43cf3a07c418086df06830221be5613d8b13c7751564a00bab52204b9c99e445",
+    "slicerSHA256": "c007ed84e5ab9d1a51d811c37122d8b5be6436a3793fd67e2611f0fb7ad90150",
+    "ownerUsedAsFixture": false,
+    "physicalPrintSent": false,
+    "realHardwareTested": false
+  },
+  "frontendAssets": [
+    {
+      "file": "index-DykhvSo8.js",
+      "sha256": "afe499e0784cb25ea70e21e849ee4208ac4cd09029e6f0cece9a3eb7db50daae",
+      "installedLocalBytesMatch": true,
+      "workspaceProxyWorkerVerifiedInIsolatedAcceptance": true
+    },
+    {
+      "file": "mesh.worker-DgOQaHIK.js",
+      "sha256": "78c0550d8cdef56f4168da1b9997b6f49a555d11d4442fa736bb08f10405990c",
+      "installedLocalBytesMatch": true,
+      "workspaceProxyWorkerVerifiedInIsolatedAcceptance": true
+    }
+  ],
+  "all24LocalAndPublicServicesHealthy": true,
+  "downloadsInstallerMatchesPublic": true,
+  "installerSHA256": "0bd7ab9665353ed3ea69dec4e9f635af97f6a339b20cdf67c0e598d90b3ff192",
+  "cleanup": {
+    "noActiveProcessReferences": true,
+    "taskCacheRemoved": true,
+    "noReparsePoints": true,
+    "filesRemoved": 8043,
+    "schema": 1,
+    "ownerDataRemoved": false,
+    "knownSyntheticFixturesAndTaskStagingOnly": true,
+    "originalUserModelsPreserved": true,
+    "bytesRemoved": 2274194607.0
+  },
+  "githubActionsUsed": false,
+  "physicalPrintSent": false,
+  "cleanHostOrRebootTested": false,
+  "sourceModelsPublished": false,
+  "concurrentInstallerWorkPreservedAndExcludedFromRelease": true
+}
