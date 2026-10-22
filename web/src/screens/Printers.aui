@@ -1,0 +1,27 @@
+Page Printers
+  Row variant=page-header
+    Stack gap=xs
+      Text variant=eyebrow "CONNECT · 3 OF 3"
+      Heading level=1 "Your printers"
+      Text variant=muted "Connect locally when you are ready to print."
+    Spacer
+    Button variant=primary action=addPrinter "Add printer"
+  If condition=$noPrinters
+    Card variant=empty
+      Icon name=Printer size=44
+      Heading level=2 "Connect your first printer"
+      Text "Add an A1 or A1 mini to print on your local network. You can prepare and slice models before pairing."
+      Button variant=primary action=addPrinter "Add printer"
+      Link href="#" "Keep preparing a model"
+  For each=$printers
+    Card
+      Row
+        Icon name=Printer
+        Heading level=2 $item.config.name
+        Spacer
+        Badge $item.status.status
+      Text $item.detail
+      For each=$item.diagnostics
+        Text variant=caption $item.message
+      Button variant=secondary item=$item.config.id action=editPrinter "Setup & diagnostics"
+  Text variant=caption "Adding or testing a printer never starts a print. Select a saved printer on Prepare before slicing for it."

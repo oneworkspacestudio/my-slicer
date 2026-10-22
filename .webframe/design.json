@@ -1,0 +1,194 @@
+{
+  "version": "1.0",
+  "project": {
+    "name": "My Slicer",
+    "type": "app",
+    "brief": "Open a model and prepare a print, with projects optional.",
+    "audience": "A1 and A1 mini owners"
+  },
+  "theme": {
+    "accent": "#345de5",
+    "surface": "#ffffff",
+    "ink": "#182a43"
+  },
+  "screens": [
+    {
+      "id": "prepare",
+      "title": "Prepare your print",
+      "route": "/",
+      "file": "prepare.html",
+      "purpose": "Prepare your print with clear empty, loading and recovery states; see screens.md.",
+      "exits": [
+        {
+          "label": "Prepare",
+          "target": "prepare"
+        },
+        {
+          "label": "Preview",
+          "target": "preview"
+        },
+        {
+          "label": "Printers",
+          "target": "printers"
+        },
+        {
+          "label": "Saved projects",
+          "target": "projects"
+        },
+        {
+          "label": "Activity",
+          "target": "activity"
+        }
+      ]
+    },
+    {
+      "id": "preview",
+      "title": "Preview the slice",
+      "route": "/#preview",
+      "file": "preview.html",
+      "purpose": "Preview the slice with clear empty, loading and recovery states; see screens.md.",
+      "exits": [
+        {
+          "label": "Prepare",
+          "target": "prepare"
+        },
+        {
+          "label": "Preview",
+          "target": "preview"
+        },
+        {
+          "label": "Printers",
+          "target": "printers"
+        },
+        {
+          "label": "Saved projects",
+          "target": "projects"
+        },
+        {
+          "label": "Activity",
+          "target": "activity"
+        }
+      ]
+    },
+    {
+      "id": "printers",
+      "title": "Your printers",
+      "route": "/#printers",
+      "file": "printers.html",
+      "purpose": "Your printers with clear empty, loading and recovery states; see screens.md.",
+      "exits": [
+        {
+          "label": "Prepare",
+          "target": "prepare"
+        },
+        {
+          "label": "Preview",
+          "target": "preview"
+        },
+        {
+          "label": "Printers",
+          "target": "printers"
+        },
+        {
+          "label": "Saved projects",
+          "target": "projects"
+        },
+        {
+          "label": "Activity",
+          "target": "activity"
+        },
+        {
+          "label": "Connect a printer",
+          "target": "printer-setup"
+        }
+      ]
+    },
+    {
+      "id": "printer-setup",
+      "title": "Connect a printer",
+      "route": "/#printer-new",
+      "file": "printer-setup.html",
+      "purpose": "Connect a printer with clear empty, loading and recovery states; see screens.md.",
+      "exits": [
+        {
+          "label": "Prepare",
+          "target": "prepare"
+        },
+        {
+          "label": "Preview",
+          "target": "preview"
+        },
+        {
+          "label": "Printers",
+          "target": "printers"
+        },
+        {
+          "label": "Saved projects",
+          "target": "projects"
+        },
+        {
+          "label": "Activity",
+          "target": "activity"
+        }
+      ]
+    },
+    {
+      "id": "projects",
+      "title": "Saved projects",
+      "route": "/#projects",
+      "file": "projects.html",
+      "purpose": "Saved projects with clear empty, loading and recovery states; see screens.md.",
+      "exits": [
+        {
+          "label": "Prepare",
+          "target": "prepare"
+        },
+        {
+          "label": "Preview",
+          "target": "preview"
+        },
+        {
+          "label": "Printers",
+          "target": "printers"
+        },
+        {
+          "label": "Saved projects",
+          "target": "projects"
+        },
+        {
+          "label": "Activity",
+          "target": "activity"
+        }
+      ]
+    },
+    {
+      "id": "activity",
+      "title": "Activity",
+      "route": "/#activity",
+      "file": "activity.html",
+      "purpose": "Activity with clear empty, loading and recovery states; see screens.md.",
+      "exits": [
+        {
+          "label": "Prepare",
+          "target": "prepare"
+        },
+        {
+          "label": "Preview",
+          "target": "preview"
+        },
+        {
+          "label": "Printers",
+          "target": "printers"
+        },
+        {
+          "label": "Saved projects",
+          "target": "projects"
+        },
+        {
+          "label": "Activity",
+          "target": "activity"
+        }
+      ]
+    }
+  ]
+}

@@ -6,7 +6,7 @@ import (
 	"github.com/oneworkspacestudio/one-workspace/pkg/apphost"
 )
 
-var version = "0.1.0-preview.1"
+var version = "0.1.0-preview.2"
 
 func main() {
 	if err := apphost.Main(apphost.Config{ID: "slicer", Name: "My Slicer", Version: version, Listen: "127.0.0.1:19020"}, webui.Files(), func(h *apphost.Host) (apphost.Application, error) { return app.New(h) }); err != nil {

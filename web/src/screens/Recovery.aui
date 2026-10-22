@@ -1,0 +1,6 @@
+Page Recovery
+  Card variant=empty
+    Heading level=1 "Let’s reopen your slicer"
+    Text "This screen could not be displayed. Your saved models and printer details are still on your server."
+    Button action=reload "Reload slicer"
+    Button variant=secondary action=prepare "Return to Prepare"

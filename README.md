@@ -24,7 +24,11 @@ your existing MyAccounts session, or run `MySlicer.exe` independently.
 
 Use Windows 10/11 x64 and an NTFS data folder. With One Workspace preview42 or
 newer, My Slicer is installed by default unless you uncheck it in advanced setup.
-Open **My Slicer**, choose **Install verified engine**, then create a project.
+Open **My Slicer** and choose **Add model**. No project setup is required.
+Prepare the plate, choose **Slice plate**, then check the layers on **Preview**.
+Install the slicing engine once when prompted; you can add models while it runs.
+Use **Save project** only when you want a named project to reuse. Recent plates
+are kept automatically. Add your printer from **Printers** when you are ready.
 The one-time official download is 474 MB; the installed runtime is about 570 MB,
 plus your models and results. Progress shows bytes, files and real validation stages.
 
@@ -62,3 +66,11 @@ See [engine provenance](docs/ENGINE.md) for the separately downloaded native eng
 
 AGPL-3.0; see [LICENSE](LICENSE), [NOTICE](NOTICE), and packaged dependency license
 texts. The app provides links to corresponding application and engine source.
+
+## See the screens
+
+[Prepare](wireframe-images/prepare.png) · [Preview](wireframe-images/preview.png) ·
+[Printers](wireframe-images/printers.png) · [Printer setup](wireframe-images/printer-setup.png) ·
+[Saved projects](wireframe-images/projects.png) · [Activity](wireframe-images/activity.png).
+
+[How to prepare a print](docs/USER-FLOW.md).

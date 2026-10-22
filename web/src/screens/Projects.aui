@@ -1,0 +1,38 @@
+Page Projects
+  Row variant=page-header
+    Stack gap=xs
+      Heading level=1 "Saved projects"
+      Text variant=muted "Keep a named project when you want to reuse a plate."
+    Spacer
+    Link href="#" variant=button "Add a model"
+  If condition=$hasProject
+    Card variant=save-project
+      Heading level=2 "Save the current plate"
+      Text "Naming a project is optional. Your recent plate is already kept for you."
+      Field label="Project name"
+        Input name=projectName placeholder="Desk organiser"
+      Button action=saveNamedProject "Save project"
+  Grid columns=2
+    Card
+      Heading level=2 "Named projects"
+      If condition=$noSavedProjects
+        Text "No named projects yet. You can still add models, slice and print."
+      For each=$savedProjects
+        Row variant=library-item
+          Stack gap=xs
+            Text $item.name
+            Text variant=caption $item.summary
+          Spacer
+          Button variant=secondary item=$item.id action=openProject "Open"
+    Card
+      Heading level=2 "Recent plates"
+      Text variant=caption "Unsaved plates are kept automatically so you can return to your work."
+      If condition=$noRecentPlates
+        Link href="#" "Start with a model"
+      For each=$recentPlates
+        Row variant=library-item
+          Stack gap=xs
+            Text $item.name
+            Text variant=caption $item.summary
+          Spacer
+          Button variant=secondary item=$item.id action=openProject "Open plate"

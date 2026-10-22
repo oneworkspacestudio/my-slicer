@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "syntheticOnly": true,
+  "ownerDataUsedAsFixture": false,
+  "physicalPrintSent": false,
+  "realHardwareContacted": false,
+  "nativeModalUnavailable": true,
+  "addModelAboveFoldDesktopAndMobile": true,
+  "noProjectCreatedOnVisit": true,
+  "repeatedAddPrinterWithoutProjectOrNativeModal": true,
+  "realEncryptedPrinterSaveAndValidationRecovery": true,
+  "savedPrinterReopensAndCodeClears": true,
+  "modelImportWithoutProjectAndReloadRestore": true,
+  "optionalProjectSaveAndFallbackModal": true,
+  "namedProjectAndNewPlatePreserveModels": true,
+  "realVerifiedEngineAndSlice": true,
+  "layers": 50,
+  "native3MFOpensOwnPlateWithoutProjectAndClearsOldSlice": true,
+  "realNative3MFRoundTrip": true,
+  "browserErrors": []
+}

@@ -67,8 +67,11 @@ type Instance struct {
 	Transform any    `json:"-"`
 }
 type Project struct {
-	ID       string   `json:"id"`
-	Name     string   `json:"name"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	// Existing records without Draft remain saved projects. Drafts are recoverable
+	// print plates, created on the first import without a project naming step.
+	Draft    bool     `json:"draft,omitempty"`
 	Revision int      `json:"revision"`
 	Settings Settings `json:"settings"`
 	Objects  []Object `json:"objects"`

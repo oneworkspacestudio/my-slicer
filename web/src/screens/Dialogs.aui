@@ -1,0 +1,41 @@
+Page Dialogs
+  If condition=$saveProjectDialog
+    Card variant=dialog aria-label="Save project"
+      Heading level=2 "Keep this as a project"
+      Text "Your plate is already kept in Recent plates. Give it a name to make it a reusable project."
+      Alert tone=error $error
+      Field label="Project name"
+        Input name=projectName autoFocus=true
+      Row
+        Button action=saveNamedProject "Save project"
+        Button variant=secondary action=close cancel=true "Cancel"
+  If condition=$printDialog
+    Card variant=dialog aria-label="Confirm print"
+      Heading level=2 "Ready to start this print?"
+      Alert tone=error $error
+      Text $printSummary
+      Text "Check the physical bed, nozzle, plate and loaded material. Starting sends this exact archive to the selected printer."
+      Checkbox name=useAMS label="Use the connected AMS lite"
+      If condition=$useAMS
+        For each=$materialMappings
+          Field label=$item.label
+            Select name=$item.name options=$trayOptions
+        Checkbox name=acceptTrayDifferences label="I reviewed and accept any color / preset differences"
+      Else
+        Checkbox name=externalConfirmed label="The correct single filament is loaded on the external spool"
+      Checkbox name=bedLeveling label="Run bed leveling"
+      Checkbox name=printConfirmed label="I checked this physical printer and want to start now"
+      Row
+        Button variant=primary action=print disabled=$printNotConfirmed "Print now"
+        Button variant=secondary action=close cancel=true "Back"
+  If condition=$driveDialog
+    Card variant=dialog aria-label="Open from Drive"
+      Heading level=2 "Open STL or Bambu 3MF from Drive"
+      Alert tone=error $error
+      Field label=Source
+        Select name=driveSource options=$driveSources
+      Text $driveFolder
+      Button variant=secondary action=driveUp "Parent folder"
+      For each=$driveEntries
+        Button variant=secondary item=$item.path action=driveEntry $item.label
+      Button variant=secondary action=close cancel=true "Close"

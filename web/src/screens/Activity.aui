@@ -1,0 +1,45 @@
+Page Activity
+  Row variant=page-header
+    Stack gap=xs
+      Heading level=1 "Activity"
+      Text variant=muted "Print jobs, recent slices and your Drive copies."
+    Spacer
+    Link href="#" variant=button-secondary "Back to Prepare"
+  Card
+    Heading level=2 "Print jobs"
+    If condition=$noPrints
+      Text "No print jobs yet. Review a ready slice and choose Print now when you are ready."
+    For each=$prints
+      Section variant=activity-item
+        Row
+          Heading level=3 $item.state
+          Badge $item.printerName
+        Text $item.message
+        Text $item.progressText
+        Row gap=sm
+          Button variant=secondary item=$item.id action=pause "Pause"
+          Button variant=secondary item=$item.id action=resume "Resume"
+          Button variant=secondary item=$item.id action=cancelPrint "Cancel print…"
+          Button variant=secondary item=$item.id action=reconcile "Refresh status"
+          If condition=$item.unknown
+            Button variant=secondary item=$item.id action=resolve "Resolve uncertain start…"
+  Card
+    Heading level=2 "Slices for this plate"
+    If condition=$noSlices
+      Text "Slice results appear here after you choose Slice plate."
+    For each=$projectSlices
+      Row variant=library-item
+        Text $item.label
+        Spacer
+        Button variant=secondary item=$item.id action=selectSlice "View"
+        Button variant=secondary item=$item.id action=deleteSlice "Remove result"
+  If condition=$workspace
+    Card
+      Heading level=2 "Drive copies"
+      Text "Originals and completed slices are copied as ordinary files while this app is open."
+      For each=$driveSaves
+        Row variant=library-item
+          Text $item.name
+          Badge $item.state
+          Text $item.message
+      Button variant=secondary action=retryDrive "Retry pending copies"

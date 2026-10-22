@@ -4,24 +4,25 @@
    Keep private application data on a local NTFS folder. Models and completed
    jobs also copy to `My Slicer/Models` and `My Slicer/Print jobs` in your Drive
    source while the browser is open; the app reports each copy's state.
-2. The owner selects **Install verified engine**. Download, checksum verification,
+2. The owner selects **Install slicing engine**. Download, checksum verification,
    extraction and real validation are visible. Do not close the server while
    setup is running. Failed setup retains the previous engine. Cancel is available.
 3. On each physical printer, inspect its firmware and enable LAN Only and
    Developer Mode where available. LAN Only disables Bambu Handy/cloud access.
    My Slicer does not update firmware or circumvent firmware command restrictions.
-4. Select **Add printer**. Discovery is optional; otherwise enter the private IP,
+4. Open **Printers**, then **Add printer**. Discovery is optional; otherwise enter the private IP,
    physical serial, model and LAN access code from that printer. Confirm the
    installed 0.4 mm nozzle and build plate. Save, inspect the two certificates,
    verify the physical IP/serial and explicitly trust that device.
-5. Select **Test connections**. Diagnostics distinguish secure status/authentication,
+5. Select **Test connection**. Diagnostics distinguish secure status/authentication,
    device identity, file listing and command-mode readiness. Reading status or
    listing storage does not prove a physical print. A new certificate needs a new
    explicit review. Codes are protected with Windows DPAPI for the hosting user.
-6. Create a project; add STL or a complete self-contained Bambu project. Select
+6. On **Prepare**, choose **Add model** for STL or a complete Bambu 3MF. No project
+   setup is required; **Save project** is optional. Select
    the actual saved printer before slicing. Set quality/materials or retain the
    complete imported native settings. Inspect the real layers and native estimates.
-7. Check the physical printer and choose **Review & print**. For an external spool,
+7. On **Preview**, check the physical printer and choose **Review print**. For an external spool,
    confirm the correct single filament is loaded. For AMS lite, choose each actual
    reported tray. Wrong material or missing trays block dispatch; color/preset
    differences require explicit review. Choose **Print now** yourself.

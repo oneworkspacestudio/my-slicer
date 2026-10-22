@@ -23,6 +23,8 @@ export function Settings({ data, onAction }: { data: any; onAction: (name: strin
       <Card>
         <Text>{data.versionText}</Text>
         <Text>{data.identityText}</Text>
+        <Link href={data.applicationSource} external={true}>My Slicer source · AGPL-3.0</Link>
+        <Link href="https://github.com/bambulab/BambuStudio/tree/v02.08.02.61" external={true}>Slicing engine source</Link>
         {data.appLinks.map((item, i) => (
           <Link key={i} href={item.href}>{item.title}</Link>
         ))}

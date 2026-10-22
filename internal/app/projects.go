@@ -98,7 +98,8 @@ func (a *App) projectRoute(w http.ResponseWriter, r *http.Request) {
 }
 func (a *App) createProject(w http.ResponseWriter, r *http.Request) {
 	var body struct {
-		Name string `json:"name"`
+		Name  string `json:"name"`
+		Draft bool   `json:"draft"`
 	}
 	if !apphost.Decode(w, r, &body) {
 		return
@@ -113,10 +114,10 @@ func (a *App) createProject(w http.ResponseWriter, r *http.Request) {
 	var count int
 	a.H.DB.QueryRow("SELECT COUNT(*) FROM slicer_projects WHERE user_id=?", uid(r)).Scan(&count)
 	if count >= 100 {
-		apphost.Problem(w, 413, "This account has reached100 projects")
+		apphost.Problem(w, 413, "This account has 100 saved projects and recent plates. Open an existing plate to keep working.")
 		return
 	}
-	p := Project{ID: apphost.ID(), Name: body.Name, Revision: 1, Settings: defaults(), Objects: []Object{}, Updated: now()}
+	p := Project{ID: apphost.ID(), Name: body.Name, Draft: body.Draft, Revision: 1, Settings: defaults(), Objects: []Object{}, Updated: now()}
 	dir := filepath.Join(a.H.Config.Data, "projects", p.ID)
 	if e := os.Mkdir(dir, 0700); e != nil {
 		a.problem(w, e)

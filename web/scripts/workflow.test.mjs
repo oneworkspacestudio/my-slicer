@@ -1,0 +1,143 @@
+import {chromium} from '@playwright/test';
+import test from 'node:test';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {spawn} from 'node:child_process';
+import {writeFile, mkdir, readFile} from 'node:fs/promises';
+import {randomBytes} from 'node:crypto';
+import assert from 'node:assert/strict';
+
+test('model-first Windows workflow preserves plates and printer setup', {timeout:420000,skip:!process.env.MYSLICER_TEST_EXE}, async()=>{
+const repo=fileURLToPath(new URL('../../',import.meta.url));
+const out=path.resolve(process.env.MYSLICER_TEST_OUTPUT||path.join(repo,'test-results/workflow'));
+const parent=process.env.MYSLICER_TEST_ROOT||'';
+assert.match(parent.replaceAll('\\','/'),/^[a-z]:\/Projects\/\.cache\/my-slicer-/i,'Choose a named isolated My Slicer NTFS test cache, never live app data');
+const root=parent+'/acceptance-'+Date.now();
+process.env.TEMP=process.env.TMP=parent;
+const password=randomBytes(24).toString('hex');
+const env={...process.env};for(const key of Object.keys(env))if(key.startsWith('WORKSPACE_'))delete env[key];
+env.WORKSPACE_BOOTSTRAP_PASSWORD=password;
+delete env.MYSLICER_ENGINE_ARCHIVE;if(process.env.MYSLICER_TEST_ENGINE_ARCHIVE)env.MYSLICER_ENGINE_ARCHIVE=process.env.MYSLICER_TEST_ENGINE_ARCHIVE;
+await mkdir(root,{recursive:true});await mkdir(out,{recursive:true});
+const child=spawn(process.env.MYSLICER_TEST_EXE,['--data',root+'/private','--listen','127.0.0.1:39126','--no-browser','--bootstrap-email','fixture@example.test'],{env,windowsHide:true,stdio:'ignore'});
+let browser,page;const errors=[],calls=[];let success=false;
+const proof={schema:1,syntheticOnly:true,ownerDataUsedAsFixture:false,physicalPrintSent:false,realHardwareContacted:false,nativeModalUnavailable:true};
+const api=async(path)=>page.evaluate(async path=>{const response=await fetch(path);if(!response.ok)throw Error('Read failed '+response.status);return response.json()},path);
+async function waitUntil(fn,timeout=30000){const start=Date.now();while(Date.now()-start<timeout){if(await fn())return;await new Promise(r=>setTimeout(r,500))}throw Error('Condition timed out');}
+try{
+ for(let n=0;n<60;n++){try{if((await fetch('http://localhost:39126/healthz')).ok)break}catch{}await new Promise(r=>setTimeout(r,500));}
+ browser=await chromium.launch({channel:'chrome',headless:true});
+ page=await browser.newPage({viewport:{width:1366,height:768}});
+ await page.addInitScript(()=>{HTMLDialogElement.prototype.showModal=undefined});
+ page.on('pageerror',e=>errors.push(e.stack||e.message));
+ page.on('request',r=>{if(r.method()!=='GET')calls.push(new URL(r.url()).pathname)});
+ await page.goto('http://localhost:39126/');
+ await page.getByRole('textbox',{name:'Email address',exact:true}).fill('fixture@example.test');
+ await page.getByLabel('Password',{exact:true}).fill(password);
+ await page.getByRole('button',{name:'Sign in',exact:true}).click();
+ await page.getByRole('heading',{name:'Start with your model'}).waitFor();
+ await waitUntil(async()=>!(await page.getByLabel('Add model',{exact:true}).isDisabled()));
+ assert.equal((await api('/api/projects')).length,0);
+ let box=await page.locator('.model-import').boundingBox();assert(box.y+box.height<768);
+ await page.screenshot({path:out+'/prepare-empty-desktop.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ box=await page.locator('.model-import').boundingBox();assert(box.y+box.height<844);
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ await page.screenshot({path:out+'/prepare-empty-mobile.png',fullPage:true});
+ proof.addModelAboveFoldDesktopAndMobile=true;proof.noProjectCreatedOnVisit=true;
+ await page.setViewportSize({width:1366,height:768});
+ for(let n=0;n<4;n++){
+  await page.getByRole('link',{name:'Printers',exact:true}).click();
+  await page.getByRole('button',{name:'Add printer',exact:true}).first().click();
+  await page.getByRole('heading',{name:'Find these details on your printer'}).waitFor();
+  assert.equal(await page.getByRole('dialog').count(),0);
+  await page.getByRole('link',{name:'← Back to printers'}).click();
+ }
+ proof.repeatedAddPrinterWithoutProjectOrNativeModal=true;
+ await page.getByRole('button',{name:'Add printer',exact:true}).first().click();
+ await page.getByRole('textbox',{name:'Printer name',exact:true}).fill('Fixture A1');
+ await page.getByRole('textbox',{name:'Local IP or hostname'}).fill('192.0.2.20');
+ await page.getByRole('textbox',{name:'Serial number',exact:true}).fill('FIXTUREA10001');
+ await page.getByLabel('LAN access code',{exact:true}).fill('12345678');
+ await page.getByRole('button',{name:'Save and continue →'}).click();
+ await page.getByRole('alert').filter({hasText:'Check the physical 0.4 mm nozzle'}).waitFor();
+ await page.getByLabel('I checked the installed nozzle is 0.4 mm').check();
+ await page.getByRole('button',{name:'Save and continue →'}).click();
+ await waitUntil(async()=>await page.getByRole('alert').count()>0);
+ assert.equal(await page.getByRole('textbox',{name:'Printer name',exact:true}).inputValue(),'Fixture A1');
+ assert.equal(await page.getByLabel('LAN access code',{exact:true}).inputValue(),'12345678');
+ // A literal private fixture address passes validation without opening a socket.
+ // Do not inspect or test certificates against this address.
+ await page.getByRole('textbox',{name:'Local IP or hostname'}).fill('10.254.254.253');
+ await page.getByRole('button',{name:'Save and continue →'}).click();
+ await page.getByRole('button',{name:'Inspect certificates',exact:true}).waitFor();
+ assert.equal((await api('/api/printers')).length,1);
+ proof.realEncryptedPrinterSaveAndValidationRecovery=true;
+ await page.screenshot({path:out+'/printer-trust-desktop.png',fullPage:true});
+ await page.getByRole('button',{name:'← Edit details'}).click();
+ await page.setViewportSize({width:390,height:844});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ await page.screenshot({path:out+'/printer-details-mobile.png',fullPage:true});
+ await page.getByRole('link',{name:'← Back to printers'}).click();
+ await page.getByRole('button',{name:'Setup & diagnostics',exact:true}).click();
+ assert.equal(await page.getByRole('textbox',{name:'Printer name',exact:true}).inputValue(),'Fixture A1');
+ assert.equal(await page.getByLabel('LAN access code',{exact:true}).inputValue(),'');
+ proof.savedPrinterReopensAndCodeClears=true;
+ await page.getByRole('link',{name:'Prepare',exact:true}).click();
+ await page.setViewportSize({width:1366,height:768});
+ await page.getByLabel('Printer model',{exact:true}).selectOption('A1 mini');
+ const cube=await readFile(path.join(repo,'samples/10mm-cube.stl'));
+ await page.getByLabel('Add model',{exact:true}).setInputFiles({name:'cube.stl',mimeType:'application/octet-stream',buffer:cube});
+ await waitUntil(async()=>{const ps=await api('/api/projects');return ps.length===1&&ps[0].objects.length===1});
+ const original=(await api('/api/projects'))[0];assert(original.draft);assert.equal(original.settings.model,'A1 mini');
+ await page.screenshot({path:out+'/prepare-model-desktop.png',fullPage:true});
+ await page.reload();await page.getByText('Unsaved plate · kept for you',{exact:true}).waitFor();
+ const restored=(await api('/api/projects'))[0];assert.equal(restored.id,original.id);assert.equal(restored.objects[0].modelID,original.objects[0].modelID);
+ proof.modelImportWithoutProjectAndReloadRestore=true;
+ await page.getByRole('button',{name:'Save project…'}).click();
+ await page.getByRole('dialog',{name:'Save project',exact:true}).waitFor();
+ await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),0);
+ await page.getByRole('button',{name:'Save project…'}).click();
+ await page.getByRole('textbox',{name:'Project name',exact:true}).fill('Reusable cube');
+ await page.getByRole('button',{name:'Save project',exact:true}).click();
+ await waitUntil(async()=>!(await api('/api/projects'))[0].draft);
+ proof.optionalProjectSaveAndFallbackModal=true;
+ await page.getByRole('button',{name:'New plate',exact:true}).click();
+ assert.equal((await api('/api/projects')).length,1);
+ await page.getByRole('link',{name:'Saved projects',exact:true}).click();
+ await page.getByRole('button',{name:'Open',exact:true}).click();
+ await page.getByRole('heading',{name:'Start with your model'}).waitFor();
+ proof.namedProjectAndNewPlatePreserveModels=true;
+ if(process.env.MYSLICER_TEST_ENGINE_ARCHIVE){
+  await page.getByRole('button',{name:'Install slicing engine',exact:true}).click();
+  await waitUntil(async()=>{const s=await api('/api/system');if(s.engine.phase==='failed')throw Error(s.engine.message);return s.engine.phase==='ready'},240000);
+  await waitUntil(async()=>!(await page.getByRole('button',{name:'Slice plate →',exact:true}).isDisabled()));
+  await page.getByRole('button',{name:'Slice plate →',exact:true}).click();
+  await page.getByRole('heading',{name:'Check before you print'}).waitFor();
+  await waitUntil(async()=>{const slices=await api('/api/slices');if(slices[0]?.state==='failed')throw Error(slices[0].message);return slices[0]?.state==='ready'},120000);
+  await page.getByRole('button',{name:'Download sliced 3MF',exact:true}).waitFor();
+  await page.screenshot({path:out+'/preview-real-slice-desktop.png',fullPage:true});
+  const slice=(await api('/api/slices'))[0];assert(slice.result.layers>0);assert(slice.result.grams>0);assert(slice.result.seconds>0);
+  proof.realVerifiedEngineAndSlice=true;proof.layers=slice.result.layers;
+  const archive=await page.request.get('http://localhost:39126/api/slices/'+slice.id+'/archive');assert(archive.ok());
+  const source=await archive.body();
+  await page.getByRole('link',{name:'← Back to Prepare',exact:true}).click();
+  await page.getByLabel('Add model',{exact:true}).setInputFiles({name:'native-cube.3mf',mimeType:'application/octet-stream',buffer:source});
+  await waitUntil(async()=>{const plates=await api('/api/projects');return plates.length===2&&plates.some(v=>v.draft&&v.objects.length===1)});
+  await page.getByRole('checkbox',{name:'Keep imported settings, modifiers and painting'}).waitFor();
+  await page.getByRole('link',{name:'Preview',exact:true}).click();
+  await page.getByRole('heading',{name:'Your slice will appear here'}).waitFor();
+  proof.native3MFOpensOwnPlateWithoutProjectAndClearsOldSlice=true;
+  await page.getByRole('link',{name:'Go to Prepare',exact:true}).click();
+  await page.getByRole('button',{name:'Slice plate →',exact:true}).click();
+  await waitUntil(async()=>{const slices=await api('/api/slices');if(slices[0]?.state==='failed')throw Error(slices[0].message);return slices.length===2&&slices[0]?.state==='ready'},120000);
+  proof.realNative3MFRoundTrip=true;
+ }
+ assert.equal(errors.length,0,errors.join('\n'));
+ assert.equal(calls.some(v=>v.endsWith('/probe')||v.endsWith('/test')||v.endsWith('/discover')||v.endsWith('/trust')||v.endsWith('/prints')),false);
+ proof.browserErrors=[];await writeFile(out+'/acceptance.json',JSON.stringify(proof,null,2));success=true;
+ console.log('Native app workflow acceptance passed '+JSON.stringify(proof));
+}catch(error){if(page)await page.screenshot({path:out+'/acceptance-failure.png',fullPage:true}).catch(()=>{});await writeFile(out+'/acceptance-errors.json',JSON.stringify({message:error.message,errors},null,2));throw error;
+}finally{await browser?.close();child.kill();await new Promise(resolve=>{if(child.exitCode!==null)resolve();else child.once('exit',resolve)});await writeFile(out+'/acceptance-process.json',JSON.stringify({pid:child.pid,root,stopped:true,success}));}
+
+});

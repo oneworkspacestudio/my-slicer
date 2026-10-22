@@ -1,0 +1,64 @@
+Page PrinterSetup
+  Row variant=page-header
+    Stack gap=xs
+      Text variant=eyebrow "PRINTER SETUP"
+      Heading level=1 $printerSetupTitle
+      Text variant=muted "A guided connection to your printer. No print is sent during setup."
+    Spacer
+    Link href="#printers" variant=button-secondary "← Back to printers"
+  Card variant=printer-setup
+    Row variant=setup-steps
+      Badge tone=$detailsTone "1 · Details"
+      Badge tone=$trustTone "2 · Trust device"
+      Badge tone=$checkTone "3 · Check connection"
+    If condition=$printerDetailsStep
+      Heading level=2 "Find these details on your printer"
+      Text "Enable LAN Only and local commands / Developer Mode where supported. LAN Only turns off Bambu Handy and cloud access. Then find the IP address, serial and LAN access code on the printer screen."
+      Button variant=secondary action=discover "Find printers on my network"
+      If condition=$discoveryEmpty
+        Text "No printers found. You can enter the details below."
+      For each=$discovered
+        Button variant=secondary item=$item.serial action=chooseDiscovered $item.label
+      Grid columns=2
+        Field label="Printer name"
+          Input name=printerName placeholder="Desk printer"
+        Field label=Model
+          Select name=printerModel options=$modelOptions
+        Field label="Local IP or hostname"
+          Input name=printerHost placeholder="192.168.1.50"
+        Field label="Serial number"
+          Input name=printerSerial placeholder="From the printer screen"
+        Field label="LAN access code"
+          Input type=password name=accessCode autoComplete=new-password
+        Field label="Physical build plate"
+          Select name=printerPlate options=$plateOptions
+      Text variant=caption "Access codes are encrypted on your server and never saved in browser storage. When editing, leave the code blank to keep the saved code."
+      Checkbox name=nozzleConfirmed label="I checked the installed nozzle is 0.4 mm"
+      Checkbox name=developerConfirmed label="I enabled local commands / Developer Mode"
+      Section variant=disclosure label="Advanced connection options"
+        Checkbox name=manualIdentity label="I checked the serial and model on the physical screen (firmware without discovery)"
+        Checkbox name=protectedData label="Use encrypted FTPS data (only if this firmware supports it)"
+      Row
+        Button variant=primary action=savePrinter "Save and continue →"
+        Link href="#printers" "Cancel"
+    Else
+      Heading level=2 $editingPrinterName
+      If condition=$printerTrustStep
+        Text "Confirm that you are connecting to your printer before trusting it. Inspect the local certificates and review both fingerprints against this device."
+        Button action=probe "Inspect certificates"
+        If condition=$trust
+          Text variant=code $trustText
+          Checkbox name=trustConfirmed label="I confirm these certificates belong to this printer"
+          Button variant=primary action=trustPrinter disabled=$notTrusted "Trust this device and continue →"
+      Else
+        Text "Check that the printer is switched on, reachable from this server and ready for local commands."
+        Button variant=primary action=testPrinter disabled=$printerTesting "Test connection"
+        If condition=$printerTesting
+          Spinner
+          Text "Checking connection…"
+        Text $printerConnectionText
+        For each=$printerDiagnostics
+          Alert $item.message
+        Link href="#printers" variant=button "Done"
+      Button variant=secondary action=printerDetails "← Edit details"
+  Link href="#" "Back to Prepare"
