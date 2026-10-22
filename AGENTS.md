@@ -17,3 +17,7 @@ Keep README and user guides plain and useful to people without technical skills.
 Use the committed .webframe contract and regenerate its visible PNGs after design
 changes. Functional browser regression is opt-in via web/scripts/workflow.test.mjs;
 provide a named NTFS test root and executable, never point it at owner data.
+
+When the header has an Apps button, emit the existing data-workspace-apps-trigger
+contract so Workspace hides its floating launcher. Keep that header control
+working with the local dialog fallback if native modal support is unavailable.

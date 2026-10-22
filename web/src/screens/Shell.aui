@@ -22,7 +22,7 @@ Page Shell
       Button variant=icon action=theme aria-label="Toggle color theme"
         Icon name=SunMoon
       If condition=$workspace
-        Button variant=secondary action=apps "Apps"
+        Button variant=secondary workspaceTrigger=true action=apps "Apps"
       Text $user.name
       Button variant=secondary action=logout "Sign out"
     Stack variant=content

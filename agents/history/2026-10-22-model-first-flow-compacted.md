@@ -74,3 +74,24 @@ test against live MyAccounts/Drive. Artifact root I:/Projects/tooling/slicer-flo
 browser fixtures stopped in finally. Stop task Flowframe39124 and verify children;
 bounded cleanup exact named C root only after final processes stop. No global temp
 sweep. Physical hardware, AMS, clean-host/reboot/security acceptance unperformed.
+
+
+## Managed visual-review follow-up
+
+App2 source c84a51c and public release2 passed exact packaged native tests and real
+Workspace64-to65 managed SSO/Drive upgrade. Source65 is363c380; publication and
+normal backed-up owner64-to65 update were underway when detailed managed phone
+review found the pre-existing floating Workspace launcher over object buttons and
+printer labels. Disclosed it and made app3 recognize Workspace's existing native
+trigger contract on the header Apps button. The floating launcher is then hidden;
+header Apps opens the suite picker, with app-local fallback if showModal is absent.
+The marker's button handler prevents duplicate delegated clicks. No model/printer
+storage changes from2 to3. Keep public2 and source65 immutable; ship final3/66 and
+preserve65's eventual publication/local update results truthfully. Do not interrupt
+an active owner backup/update. Verify current receipts before normal65-to66 update.
+
+Owner65 attempt stopped at backup-capacity preflight before any replacement.
+The old64 manager restarted automatically; all24 services healthy and old journal
+complete. Preserve that state. Final normal update is64-to66, after removing only
+task cache copies and running the exact verified installer/bundle from I: so C:
+has sufficient protected recovery capacity. Keep Downloads65; copy66 after update.

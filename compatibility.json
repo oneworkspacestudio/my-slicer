@@ -1,6 +1,6 @@
 {
   "schema":1,"workspaceInstallerIntegration":2,"minimumWorkspaceVersion":"0.3.0-preview.42",
-  "repository":"oneworkspacestudio/my-slicer","app":"slicer","name":"My Slicer","executable":"MySlicer.exe","version":"0.1.0-preview.2",
+  "repository":"oneworkspacestudio/my-slicer","app":"slicer","name":"My Slicer","executable":"MySlicer.exe","version":"0.1.0-preview.3",
   "route":"/slicer","callback":"/slicer/auth/callback","health":"/healthz","standalone":true,"mainExecutableCount":1,"childProcesses":true,
   "backup":"OWBACKUP1","dataFilesystem":"NTFS","runtimeDependencies":"Windows10/11x64; official pinned Bambu Studio runtime installed by setup; WebGL browser"
 }
