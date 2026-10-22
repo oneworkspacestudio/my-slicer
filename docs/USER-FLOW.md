@@ -29,3 +29,14 @@ so its layout, modifiers and painting are not mixed with another plate.
 **Activity** contains print jobs, previous slices and the status of Drive copies.
 Return to Prepare and slice again after changing a model, print settings or target
 printer. Printing always needs a current slice and your explicit confirmation.
+
+
+## The screens
+
+Use **Apps** in the header to switch Workspace apps without a shortcut covering
+the slicer controls.
+
+![Prepare a model](screenshots/slicer3-prepare-desktop.png)
+
+[Prepare on a phone](screenshots/slicer3-prepare-phone.png) ·
+[Printer setup on a phone](screenshots/slicer3-printer-phone.png).
