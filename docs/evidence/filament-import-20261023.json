@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "workspace": "0.3.0-preview.74",
+  "slicer": "0.1.0-preview.6",
+  "sourceCommit": "a60092534881918113d1d91b410a0717204831b4",
+  "release": "https://github.com/oneworkspacestudio/my-slicer/releases/tag/v0.1.0-preview.6",
+  "slicerSHA256": "13d61f97212a959928d33bb9f86b11a90ce5433ba64b902fd3e4228b8453b0b2",
+  "exactTestedPublishedExecutableInstalled": true,
+  "normalBackedUpAppOnlyUpdater": true,
+  "nativeUpdaterExitCode": 0,
+  "otherAppContractsAndPackageHashesUnchanged": true,
+  "managerAndSocialBytesPreserved": true,
+  "identityPathsPortsSelectionAutostartPreserved": true,
+  "allAppsHealthy": true,
+  "healthyServiceCount": 25,
+  "rollbackManifestVerified": true,
+  "rollbackManifestSHA256": "ed9f37a861a4bceb5156074096b540fc71951d9eb7a84f6c14eadc1e178a2ac7",
+  "ownerInstallationUsedAsFixture": false,
+  "physicalPrintSent": false,
+  "servedFrontendAndWorkerBytesMatchTestedBuild": [
+    {
+      "asset": "assets/index-DW-Aw9_l.js",
+      "sha256": "8da543a7f53b6406727f183c775b1b14f4931040029f7fe30f6ace4eb89d907a"
+    },
+    {
+      "asset": "assets/index-p5_0RyDB.css",
+      "sha256": "51805b52486c218609cc2816b01d49acf79e3e5141af702dde7d8ee6322bbcf6"
+    },
+    {
+      "asset": "assets/mesh.worker-DgOQaHIK.js",
+      "sha256": "78c0550d8cdef56f4168da1b9997b6f49a555d11d4442fa736bb08f10405990c"
+    }
+  ],
+  "publicAndLocalServicesHealthy": true,
+  "testPreviewsStoppedAndNamedCacheRemoved": true,
+  "userModelSourceOrImagesPublished": false,
+  "physicalPrinterContactedByAcceptance": false,
+  "realReportedModelSliceTarget": "A1",
+  "realReportedModelFilamentSlots": 2,
+  "realReportedModelLayers": 75,
+  "desktopAndPhoneLayoutChecked": true,
+  "materialSelectionsSurviveReload": true
+}

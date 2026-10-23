@@ -37,9 +37,22 @@ my-slicer-filament-20261023 cache only. Source/data must not use owner installat
 as a functional fixture. Existing Bambu Studio windows belong to the user; do not
 stop them or confuse them with the headless engine under the test cache.
 
-Next: commit source, package6 and compare exact EXE with native candidate. Publish
-immutable6 with all asset hashes/source/licences and four-package update manifest
-validated by the current native Workspace distribution code. Then normal protected
-Slicer-only update, preserving current manager, other apps, identities and data.
-Wait actual updater exit/cleanup; verify installed hashes, health and retained
-rollback, clean only stopped named task caches and record final delivery.
+Delivery complete: source a60092534881918113d1d91b410a0717204831b4 pushed main,
+branch and immutable v0.1.0-preview.6. All12 public asset sizes/SHA256 verified,
+including source ZIP and complete notices. Exact tested/published/installed EXE:
+13d61f97212a959928d33bb9f86b11a90ce5433ba64b902fd3e4228b8453b0b2.
+Native Workspace74 publisher generated the four-owned-package manifest; uncached
+validation against actual public asset metadata and SelectUpdates scope passed.
+
+Normal protected Slicer-only offline update used the checksum-verified public74
+bundle/setup with only Slicer payloads changed. Full consistent backup verified,
+native updater actually exited0, latest verified recovery copy retained. Kept
+Workspace74, Social4 actual bytes, all non-Slicer app contracts/package hashes,
+identity, paths, ports, selection and autostart. All25 local/public managed
+services healthy. Installed frontend/mesh-worker hashes match the tested build.
+No owner-installation functional fixture or physical print. Stopped isolated test
+installations/named NTFS cache removed after path/reparse/process checks; user's
+separate Bambu Studio windows were left alone. Public evidence is sanitized and
+contains no supplied model source or screenshots. No delivery work remains.
+User should refresh My Slicer, reopen the file and choose a matching material for
+each numbered filament when retargeting to A1/A1 mini.
