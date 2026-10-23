@@ -72,3 +72,22 @@ Dialogs for optional naming, Drive selection and explicit print confirmation hav
 close/escape/focus handling and a fallback when native modal support is missing.
 A rendering failure offers Reload slicer and Return to Prepare, preserving server
 data rather than showing a blank page. Existing Settings & backup remain reachable.
+
+
+## Studio revision of shared layout
+Prepare/Preview share a left Printer, Nozzle, Project Filaments and Process rail.
+Process has Quality, Strength, Speed, Support and Others sections; Advanced reveals
+additional validated settings. Global/Objects switches settings/object selection.
+Prepare toolbar offers Add model, New plate, arrange, move/rotate/scale, duplicate,
+delete and undo. Unsupported modeling tools remain disabled with explanations.
+Native multiple plates have a real numbered plate picker and overview; selecting
+a plate preserves the original archive and only changes the active native plate.
+Preview retains the rail, shows actual toolpaths and slicing result with vertical
+layer range and horizontal move visibility control. Empty/failed/queued results
+stay actionable. Print plate always opens the existing explicit review.
+Device replaces the visible Printers tab label but retains #printers compatibility.
+Its left saved-device/status menu, camera area, printing progress, telemetry and
+filament trays reflect real API state. No paired device shows dashes and setup;
+camera/motion are unavailable without implemented capability. No automatic probe.
+Project links existing projects and Activity. Calibration explains native validation
+and manual device calibration; unavailable hardware actions cannot be executed.

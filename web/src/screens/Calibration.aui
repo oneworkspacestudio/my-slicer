@@ -1,0 +1,23 @@
+Page Calibration variant=studio-page
+  Row variant=page-header
+    Heading level=1 "Calibration"
+    Link href="#printers" variant=button-secondary "Open Device"
+  Grid columns=2
+    Card
+      Icon name=ShieldCheck size=32
+      Heading level=2 "Native slicing engine"
+      Badge $engine.phase
+      Text $engine.message
+      Text "Engine setup validates a real A1 and A1 mini slice before profiles become available."
+      If condition=$engineNeeded
+        Button action=installEngine disabled=$engine.busy "Install slicing engine"
+        Section id=engine-progress
+      Else
+        Link href="#" variant=button "Prepare a calibration model"
+    Card
+      Icon name=SlidersHorizontal size=32
+      Heading level=2 "Printer calibration"
+      Text "Run bed leveling, vibration compensation and flow calibration on the printer’s screen. Remote calibration commands are unavailable through this connection."
+      Text "Check the physical nozzle and build plate match the selected profile before printing a calibration model."
+      Link href="#printer-new" variant=button-secondary "Add or check a printer"
+  Link href="#settings" "Engine source, licenses & backup"

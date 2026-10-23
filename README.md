@@ -28,7 +28,7 @@ Open **My Slicer** and choose **Add model**. No project setup is required.
 Prepare the plate, choose **Slice plate**, then check the layers on **Preview**.
 Install the slicing engine once when prompted; you can add models while it runs.
 Use **Save project** only when you want a named project to reuse. Recent plates
-are kept automatically. Add your printer from **Printers** when you are ready.
+are kept automatically. Add your printer from **Device** when you are ready.
 The one-time official download is 474 MB; the installed runtime is about 570 MB,
 plus your models and results. Progress shows bytes, files and real validation stages.
 
@@ -42,6 +42,24 @@ your own protected data path:
 Follow the local first-owner link shown by the app. No default password is shipped.
 See [setup](docs/SETUP.md) before connecting your printer. Printing requires you
 to check the physical bed, nozzle, plate and filament and explicitly press Print.
+
+## Studio workspace
+
+Prepare and Preview use the familiar compact Studio layout: charcoal menus,
+green navigation/actions, a printer/filament/process rail, full-height build plate,
+model toolbar, dark slicing summary and layer/toolpath sliders. Native 3MF can
+show every imported plate together. STL placement remains editable; native 3MF
+keeps its original structure. Quality, Strength, Speed, Support and Others expose
+validated native process settings. Advanced hides the less common controls.
+
+Device shows saved printers, actual reported temperatures, filament trays and
+tracked print progress. Camera, jogging, extrusion and remote hardware calibration
+are explicitly unavailable through the supported connection. These panels never
+substitute sample telemetry for a live printer. Calibration reports native engine
+setup and explains the checks performed on the printer itself.
+
+The layout follows Bambu Studio references while retaining My Slicer identity;
+this app does not implement every Bambu Studio command or hardware integration.
 
 ## Project support
 
@@ -70,7 +88,10 @@ texts. The app provides links to corresponding application and engine source.
 ## See the screens
 
 [Prepare](wireframe-images/prepare.png) · [Preview](wireframe-images/preview.png) ·
-[Printers](wireframe-images/printers.png) · [Printer setup](wireframe-images/printer-setup.png) ·
-[Saved projects](wireframe-images/projects.png) · [Activity](wireframe-images/activity.png).
+[Device](wireframe-images/printers.png) · [Printer setup](wireframe-images/printer-setup.png) ·
+[Project](wireframe-images/projects.png) · [Activity](wireframe-images/activity.png) · [Calibration](wireframe-images/calibration.png).
 
 [How to prepare a print](docs/USER-FLOW.md).
+
+Multi-plate overview supports up to 9 imported plates together. Larger projects
+use the imported plate selector to keep mesh memory bounded.

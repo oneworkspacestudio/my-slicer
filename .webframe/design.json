@@ -3,13 +3,13 @@
   "project": {
     "name": "My Slicer",
     "type": "app",
-    "brief": "Open a model and prepare a print, with projects optional.",
+    "brief": "A familiar Studio-style Prepare, Preview and Device workflow with real slicing and safe local printer setup.",
     "audience": "A1 and A1 mini owners"
   },
   "theme": {
-    "accent": "#345de5",
+    "accent": "#00ae42",
     "surface": "#ffffff",
-    "ink": "#182a43"
+    "ink": "#262d2f"
   },
   "screens": [
     {
@@ -28,16 +28,20 @@
           "target": "preview"
         },
         {
-          "label": "Printers",
+          "label": "Device",
           "target": "printers"
         },
         {
-          "label": "Saved projects",
+          "label": "Project",
           "target": "projects"
         },
         {
           "label": "Activity",
           "target": "activity"
+        },
+        {
+          "label": "Calibration",
+          "target": "calibration"
         }
       ]
     },
@@ -57,25 +61,29 @@
           "target": "preview"
         },
         {
-          "label": "Printers",
+          "label": "Device",
           "target": "printers"
         },
         {
-          "label": "Saved projects",
+          "label": "Project",
           "target": "projects"
         },
         {
           "label": "Activity",
           "target": "activity"
+        },
+        {
+          "label": "Calibration",
+          "target": "calibration"
         }
       ]
     },
     {
       "id": "printers",
-      "title": "Your printers",
+      "title": "Device",
       "route": "/#printers",
       "file": "printers.html",
-      "purpose": "Your printers with clear empty, loading and recovery states; see screens.md.",
+      "purpose": "Saved devices, real telemetry, camera availability and printing progress.",
       "exits": [
         {
           "label": "Prepare",
@@ -86,11 +94,11 @@
           "target": "preview"
         },
         {
-          "label": "Printers",
+          "label": "Device",
           "target": "printers"
         },
         {
-          "label": "Saved projects",
+          "label": "Project",
           "target": "projects"
         },
         {
@@ -100,6 +108,10 @@
         {
           "label": "Connect a printer",
           "target": "printer-setup"
+        },
+        {
+          "label": "Calibration",
+          "target": "calibration"
         }
       ]
     },
@@ -119,16 +131,20 @@
           "target": "preview"
         },
         {
-          "label": "Printers",
+          "label": "Device",
           "target": "printers"
         },
         {
-          "label": "Saved projects",
+          "label": "Project",
           "target": "projects"
         },
         {
           "label": "Activity",
           "target": "activity"
+        },
+        {
+          "label": "Calibration",
+          "target": "calibration"
         }
       ]
     },
@@ -148,16 +164,20 @@
           "target": "preview"
         },
         {
-          "label": "Printers",
+          "label": "Device",
           "target": "printers"
         },
         {
-          "label": "Saved projects",
+          "label": "Project",
           "target": "projects"
         },
         {
           "label": "Activity",
           "target": "activity"
+        },
+        {
+          "label": "Calibration",
+          "target": "calibration"
         }
       ]
     },
@@ -177,16 +197,37 @@
           "target": "preview"
         },
         {
-          "label": "Printers",
+          "label": "Device",
           "target": "printers"
         },
         {
-          "label": "Saved projects",
+          "label": "Project",
           "target": "projects"
         },
         {
           "label": "Activity",
           "target": "activity"
+        },
+        {
+          "label": "Calibration",
+          "target": "calibration"
+        }
+      ]
+    },
+    {
+      "id": "calibration",
+      "title": "Calibration",
+      "route": "/#calibration",
+      "file": "calibration.html",
+      "purpose": "Native engine validation and honest printer calibration guidance.",
+      "exits": [
+        {
+          "label": "Prepare",
+          "target": "prepare"
+        },
+        {
+          "label": "Device",
+          "target": "printers"
         }
       ]
     }

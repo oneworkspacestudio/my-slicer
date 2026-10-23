@@ -3,7 +3,7 @@ import { Alert, Button, Page, Row, Spinner, Stack, Text } from "@/components/ui"
 
 export function SceneStatus({ data, onAction }: { data: any; onAction: (name: string) => void }) {
   return (
-    <Page>
+    <Page variant="scene-status">
       {data.loading && (
         <Alert>
           <Stack gap="xs">

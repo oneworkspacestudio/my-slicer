@@ -1,43 +1,51 @@
-Page Shell
-  Stack variant=sidebar
-    Row variant=brand
-      Image src=$logo alt=$name width=38 height=38
-      Stack gap=xs
-        Heading level=2 $name
-        Text variant=caption "ONE WORKSPACE"
+Page Shell variant=studio
+  Row variant=menubar
+    Section variant=disclosure label="☰ File⌄"
+      Text variant=caption $user.name
+      Button variant=secondary action=newPlate "New plate"
+      Link href="#projects" "Open project…"
+      Button variant=secondary action=showSaveProject disabled=$noObjects "Save project…"
+      Link href="#activity" "Print history"
+      Link href="#settings" "Settings & backup"
+      Button variant=secondary action=logout "Sign out"
+    Divider
+    Button variant=tool action=showSaveProject disabled=$noObjects aria-label="Save project"
+      Icon name=Save size=17
+    Button variant=tool action=undo disabled=$noUndo aria-label="Undo"
+      Icon name=Undo2 size=17
+    Spacer
+    Text $plateName
+    Spacer
+    Text variant=caption "My Slicer"
+    Button variant=tool action=theme aria-label="Toggle color theme"
+      Icon name=SunMoon size=16
+    If condition=$workspace
+      Button variant=tool workspaceTrigger=true action=apps "Apps"
+    Link href="#settings" variant=menu aria-label=Settings
+      Icon name=Settings2 size=16
+  Row variant=studio-nav
+    Link href="#" variant=home aria-label=Home
+      Icon name=House size=21
     For each=$nav
       Link href=$item.href variant=$item.variant
+        Icon name=$item.icon size=18
         Text $item.title
     Spacer
-    Text variant=caption "Your data stays on your server."
-    Link href="#settings" variant=nav "Settings & backup"
-    If condition=$workspace
-      Link href=$workspace variant=nav "← One Workspace"
-  Stack variant=workspace
-    Row variant=topbar
-      Heading level=2 $heading
-      Spacer
-      If condition=$searchURL
-        Link href=$searchURL "Search Workspace"
-      Button variant=icon action=theme aria-label="Toggle color theme"
-        Icon name=SunMoon
-      If condition=$workspace
-        Button variant=secondary workspaceTrigger=true action=apps "Apps"
-      Text $user.name
-      Button variant=secondary action=logout "Sign out"
-    Stack variant=content
-      If condition=$error
-        Alert tone=error $error
-      If condition=$notice
-        Alert tone=success $notice
-      If condition=$busy
-        Row
-          Spinner
-          Text $busy
-      Section id=screen-outlet
-    If condition=$appsOpen
-      Card variant=dialog aria-label="Workspace apps"
-        Heading level=2 "Your Workspace apps"
-        For each=$appLinks
-          Link href=$item.href $item.title
-        Button variant=secondary action=closeApps "Close"
+    Button variant=slice action=slice disabled=$cannotSlice "Slice plate"
+    Button variant=print action=reviewPrint disabled=$cannotReviewPrint "Print plate"
+  Stack variant=studio-content
+    If condition=$error
+      Alert tone=error $error
+    If condition=$notice
+      Alert tone=success $notice
+    If condition=$busy
+      Row variant=busy
+        Spinner
+        Text $busy
+    Section id=screen-outlet
+  If condition=$appsOpen
+    Card variant=dialog aria-label="Workspace apps"
+      Heading level=2 "Your Workspace apps"
+      For each=$appLinks
+        Link href=$item.href $item.title
+      Button variant=secondary action=closeApps "Close"

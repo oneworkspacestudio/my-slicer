@@ -1,51 +1,61 @@
-Page Preview
-  Row variant=page-header
-    Stack gap=xs
-      Text variant=eyebrow "PREVIEW · 2 OF 3"
-      Heading level=1 "Check before you print"
-      Text variant=muted "Inspect the actual sliced layers and material estimates."
-    Spacer
-    Link href="#" variant=button-secondary "← Back to Prepare"
-  If condition=$activeSlice
-    Grid columns=2 variant=slicer
-      Card variant=plate
-        Heading level=2 $plateName
-        Section id=scene
-        Text variant=caption $sceneNotice
-        If condition=$sliceReady
-          Field label="Preview layer"
-            Input name=layer type=range min=1 max=$maxLayer step=1
-          Text $layerText
-          Field label="Toolpath feature"
-            Select name=feature options=$featureOptions
-      Card variant=print-settings
-        Heading level=2 $sliceTitle
-        Text $activeSlice.message
+Page Preview variant=studio-workbench
+  Section id=printer-rail
+  Stack variant=stage
+    Row variant=toolstrip
+      Icon name=Layers size=22
+      Text $plateName
+      Spacer
+      Link href="#" "Back to Prepare"
+    Section id=scene
+    If condition=$activeSlice
+      Card variant=slice-result
+        Row
+          Heading level=3 "Slicing Result"
+          Spacer
+          Text $sliceTitle
+        Divider
+        Field label="Color scheme" variant=inline
+          Select name=feature options=$featureOptions
+        Row variant=result-columns
+          Text "Filament"
+          Spacer
+          Text "Total"
+        Row
+          Badge tone=success "1"
+          Text $filamentText
+        Divider
+        Heading level=3 "Time Estimation"
+        Text $timeText
+        Text $layerCount
+        Text variant=caption $activeSlice.message
         Text variant=caption $sliceElapsed
         If condition=$slicing
           Spinner
           Button variant=secondary action=cancelSlice "Cancel slicing"
         If condition=$sliceReady
-          Row gap=md
-            Metric value=$timeText
-            Text $filamentText
-            Badge $layerCount
-          Button variant=secondary action=downloadSlice "Download sliced 3MF"
+          Button variant=secondary action=downloadSlice "Export sliced 3MF"
           If condition=$noSliceTarget
-            Link href="#printers" variant=button-secondary "Add a printer to print directly"
-            Text variant=caption "Select the printer on Prepare and slice again for that device."
+            Link href="#printers" "Add a printer to print directly"
           Else
-            Button variant=primary action=reviewPrint disabled=$cannotReviewPrint "Review print →"
-            If condition=$printerNeedsConnection
-              Link href="#printers" "Connect and test your printer first"
+            Button action=reviewPrint disabled=$cannotReviewPrint "Print plate"
           If condition=$staleSlice
             Alert tone=warning $staleReason
         If condition=$sliceFailed
-          Alert tone=warning "Your model is kept. Return to Prepare, check the settings and try slicing again."
-          Link href="#" variant=button "Back to Prepare"
-  Else
-    Card variant=empty
-      Icon name=Layers size=40
-      Heading level=2 "Your slice will appear here"
-      Text "Add a model on Prepare, choose your settings and select Slice plate."
-      Link href="#" variant=button "Go to Prepare"
+          Alert tone=warning "Your model is kept. Check the settings on Prepare and slice again."
+      If condition=$sliceReady
+        Stack variant=layer-slider
+          Text $maxLayer
+          Input name=layer type=range min=1 max=$maxLayer step=1 aria-label="Preview layer"
+          Text $layerText
+        Row variant=path-slider
+          Icon name=ChevronsRight size=18
+          Input name=pathPercent type=range min=1 max=100 step=1 aria-label="Visible toolpath percentage"
+          Text $pathText
+    Else
+      Stack variant=stage-empty
+        Icon name=Layers size=40
+        Heading level=1 "Your slice will appear here"
+        Text "Add a model on Prepare and select Slice plate."
+        Link href="#" variant=button "Go to Prepare"
+    Row variant=stage-status
+      Text variant=caption $sceneNotice

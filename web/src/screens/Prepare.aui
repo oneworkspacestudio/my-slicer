@@ -1,102 +1,60 @@
-Page Prepare
-  Row variant=page-header
-    Stack gap=xs
-      Text variant=eyebrow "PREPARE · 1 OF 3"
-      Heading level=1 "Start with your model"
-      Text variant=muted "Add a model, set up the plate, then preview your slice."
-  Row variant=importbar
-    Input type=file name=modelFile variant=import label="Add model" accept=".stl,.3mf"
-    If condition=$workspace
-      Button variant=secondary action=openDrive "Open from Drive"
-    Spacer
-    Button variant=secondary action=showSaveProject disabled=$noObjects "Save project…"
-    Button variant=secondary action=newPlate "New plate"
-  Grid columns=2 variant=slicer
-    Stack gap=md
-      Card variant=plate
+Page Prepare variant=studio-workbench
+  Section id=printer-rail
+  Stack variant=stage
+    Row variant=toolstrip
+      Input type=file name=modelFile variant=import label="Add model" accept=".stl,.3mf"
+      If condition=$workspace
+        Button variant=tool action=openDrive aria-label="Open from Drive"
+          Icon name=FolderOpen size=22
+      Button variant=tool action=newPlate aria-label="New plate"
+        Icon name=Grid2X2 size=24
+      Divider
+      Button variant=tool action=arrange disabled=$notEditable aria-label="Arrange objects"
+        Icon name=LayoutGrid size=23
+      Button variant=tool action=toggleTransform disabled=$notEditable aria-label="Move, rotate and scale"
+        Icon name=Move size=23
+      Button variant=tool action=duplicate disabled=$notEditable aria-label="Duplicate object"
+        Icon name=Copy size=23
+      Button variant=tool action=remove disabled=$notEditable aria-label="Remove object"
+        Icon name=Trash2 size=23
+      Button variant=tool action=fitView aria-label="Fit plate to view"
+        Icon name=Scan size=23
+      Button variant=tool action=topView aria-label="Top view"
+        Icon name=Box size=23
+      Spacer
+      Badge $plateLabel
+    Section id=scene
+    If condition=$noObjects
+      Stack variant=stage-empty
+        Icon name=Box size=40
+        Heading level=1 "Prepare your plate"
+        Text "Add an STL or Bambu 3MF model to begin."
+    If condition=$showTransform
+      Card variant=transform
+        Heading level=3 "Move, rotate & scale"
+        Field label=Object
+          Select name=objectID options=$objectOptions
+        Grid columns=3
+          Field label="X (mm)"
+            Input name=x type=number step=1
+          Field label="Y (mm)"
+            Input name=y type=number step=1
+          Field label="Z (mm)"
+            Input name=z type=number step=1
+          Field label="Rotate X (°)"
+            Input name=rx type=number step=5
+          Field label="Rotate Y (°)"
+            Input name=ry type=number step=5
+          Field label="Rotate Z (°)"
+            Input name=rz type=number step=5
+          Field label="Scale (%)"
+            Input name=scale type=number min=1 max=10000
         Row
-          Heading level=2 "Build plate"
-          Spacer
-          Badge $plateLabel
-        If condition=$noObjects
-          Text variant=muted "STL or Bambu 3MF · No project setup needed. Choose Add model above to begin."
-        Section id=scene
-        Text variant=caption $sceneNotice
-        If condition=$importNotice
-          Alert $importNotice
-        If condition=$hasObjects
-          Row
-            Field label=Object
-              Select name=objectID options=$objectOptions
-            Button variant=secondary action=duplicate disabled=$notEditable "Duplicate"
-            Button variant=secondary action=remove disabled=$notEditable "Remove"
-            Button variant=secondary action=arrange disabled=$notEditable "Arrange"
-            Button variant=secondary action=undo disabled=$noUndo "Undo"
-        If condition=$editable
-          Section variant=disclosure label="Position, rotation & scale"
-            Grid columns=3
-              Field label="X (mm)"
-                Input name=x type=number step=1
-              Field label="Y (mm)"
-                Input name=y type=number step=1
-              Field label="Z (mm)"
-                Input name=z type=number step=1
-              Field label="Rotate X (°)"
-                Input name=rx type=number step=5
-              Field label="Rotate Y (°)"
-                Input name=ry type=number step=5
-              Field label="Rotate Z (°)"
-                Input name=rz type=number step=5
-              Field label="Scale (%)"
-                Input name=scale type=number min=1 max=10000
-            Row
-              Button action=transform "Apply changes"
-              Button variant=secondary action=reset "Reset position"
-    Card variant=print-settings
-      Heading level=2 "Print settings"
-      If condition=$engineNeeded
-        Section variant=engine
-          Heading level=3 "One-time slicing engine setup"
-          Text $engine.message
-          If condition=$engine.busy
-            Text variant=caption $engineProgress
-          Section id=engine-progress
-          Text variant=caption "474 MB download · You can add models while setup runs."
-          If condition=$owner
-            Button action=installEngine disabled=$engine.busy "Install slicing engine"
-            If condition=$engine.busy
-              Button variant=secondary action=cancelEngine cancel=true "Cancel setup"
-          Else
-            Text "Ask the Workspace owner to finish engine setup."
-      Field label=Printer
-        Select name=target options=$printerOptions
-      Link href="#printers" "Add or manage printers"
-      Grid columns=2
-        Field label="Printer model"
-          Select name=model options=$modelOptions disabled=$hasTarget
-        Field label="Build plate"
-          Select name=plate options=$plateOptions disabled=$hasTarget
-      Text variant=caption "Verified 0.4 mm nozzle profiles. Pairing a printer is optional for slicing."
-      If condition=$nativeProject
-        Field label="Imported plate"
-          Select name=nativePlate options=$nativePlates
-        Checkbox name=preserveImported label="Keep imported settings, modifiers and painting"
-      If condition=$engineReady
-        Field label=Material
-          Select name=filament options=$filamentOptions disabled=$preserving
-        Field label=Quality
-          Select name=quality options=$processOptions disabled=$preserving
-        Section variant=disclosure label="Advanced print settings"
-          Grid columns=2
-            Field label="Layer height (mm)"
-              Input name=layerHeight type=number step=0.01 min=0.08 max=0.28 disabled=$preserving
-            Field label="Infill (%)"
-              Input name=infill type=number min=0 max=100 disabled=$preserving
-            Field label=Walls
-              Input name=walls type=number min=1 max=20 disabled=$preserving
-            Field label=Brim
-              Select name=brim options=$brimOptions disabled=$preserving
-          Checkbox name=supports label="Generate supports" disabled=$preserving
-          Button variant=secondary action=saveSettings disabled=$noObjects "Apply settings"
-      Button variant=primary action=slice disabled=$cannotSlice "Slice plate →"
-      Text variant=caption $sliceHint
+          Button action=transform "Apply changes"
+          Button variant=secondary action=reset "Reset position"
+          Button variant=secondary action=toggleTransform cancel=true "Close"
+    Row variant=stage-status
+      Text variant=caption $sceneNotice
+      Spacer
+      If condition=$importNotice
+        Text variant=caption $importNotice

@@ -107,10 +107,16 @@ func Slice(ctx context.Context, root, dir string, c SliceConfig) (SliceResult, e
 		args = append(args, "--load-filaments", strings.Join(filaments, ";"))
 	}
 	allowed := map[string]bool{"layer_height": true, "sparse_infill_density": true, "wall_loops": true, "enable_support": true, "brim_type": true, "curr_bed_type": true, "enable_arc_fitting": true, "print_sequence": true}
+	process := map[string]string{}
 	for key, value := range c.Overrides {
 		if !allowed[key] {
-			return result, errors.New("Unsupported native override")
+			process[key] = Text(value)
 		}
+	}
+	if e := ValidateProcess(process); e != nil {
+		return result, e
+	}
+	for key, value := range c.Overrides {
 		args = append(args, "--"+strings.ReplaceAll(key, "_", "-")+"="+Text(value))
 	}
 	args = append(args, "--slice", strconv.Itoa(c.Plate), "--outputdir", dir, "--export-3mf", "result.gcode.3mf", "--export-settings", filepath.Join(dir, "effective.json"), c.Input)

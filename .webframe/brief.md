@@ -31,3 +31,17 @@ The shared blue branding, light/dark mode and accessible keyboard flow stay inta
 The requested crash has not reproduced on a fresh supported Chrome installation.
 Test repeated setup, saved printer validation, embedded launch and missing native
 dialog support, and report that distinction honestly.
+
+
+## Studio desktop revision
+Match the supplied Bambu Studio Prepare, Preview and Device layout: charcoal menu
+and navigation, green active tabs/actions, 400px white settings rail, neutral gray
+full-height plate, compact icon toolbar, layer sliders and dark slicing summary.
+Keep My Slicer identity and working account/Apps navigation. Model import remains
+above the canvas with no mandatory project. Preserve all saved projects/imports,
+native geometry, settings and pairing protections. Add Device/Project/Calibration
+top tabs; old printer/project/activity hashes remain valid. Phone uses canvas-first
+stacking with accessible settings below. Never substitute fake camera, temperatures,
+estimates or finished print state. Unsupported printer motion/camera controls are
+explicitly unavailable, not presented as a live connection. Native process controls
+are validated and stored; imported settings remain authoritative when preserved.

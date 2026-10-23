@@ -1,27 +1,99 @@
-Page Printers
-  Row variant=page-header
-    Stack gap=xs
-      Text variant=eyebrow "CONNECT · 3 OF 3"
-      Heading level=1 "Your printers"
-      Text variant=muted "Connect locally when you are ready to print."
-    Spacer
-    Button variant=primary action=addPrinter "Add printer"
-  If condition=$noPrinters
-    Card variant=empty
-      Icon name=Printer size=44
-      Heading level=2 "Connect your first printer"
-      Text "Add an A1 or A1 mini to print on your local network. You can prepare and slice models before pairing."
-      Button variant=primary action=addPrinter "Add printer"
-      Link href="#" "Keep preparing a model"
-  For each=$printers
-    Card
-      Row
-        Icon name=Printer
-        Heading level=2 $item.config.name
+Page Printers variant=device
+  Stack variant=device-sidebar
+    Row variant=rail-heading
+      Icon name=Printer size=17
+      Text "Device"
+      Spacer
+      Button variant=tool action=addPrinter aria-label="Add printer"
+        Icon name=Plus size=19
+    For each=$printers
+      Button variant=$item.deviceVariant item=$item.config.id action=selectDevice $item.config.name
+    Text variant=device-selected "Status"
+    Link href="#activity" variant=device-item "Print history"
+    Link href="#projects" variant=device-item "Projects"
+    Link href="#calibration" variant=device-item "Calibration"
+    Button variant=secondary action=addPrinter "Add printer"
+  Stack variant=device-main
+    Stack variant=camera-section
+      Row variant=panel-heading
+        Text "Camera"
         Spacer
-        Badge $item.status.status
-      Text $item.detail
-      For each=$item.diagnostics
-        Text variant=caption $item.message
-      Button variant=secondary item=$item.config.id action=editPrinter "Setup & diagnostics"
-  Text variant=caption "Adding or testing a printer never starts a print. Select a saved printer on Prepare before slicing for it."
+        Icon name=VideoOff size=18
+      Stack variant=camera
+        Icon name=VideoOff size=42
+        Heading level=2 "Camera unavailable"
+        Text "Live video is not exposed by the supported local printer connection."
+        If condition=$noPrinters
+          Button action=addPrinter "Connect your first printer"
+        Else
+          Text $deviceConnection
+    Card variant=printing-progress
+      Row variant=panel-heading
+        Text "Printing Progress"
+        Spacer
+        Link href="#activity" "View history"
+      If condition=$devicePrint
+        Heading level=3 $devicePrint.name
+        Text $devicePrint.state
+        Section id=print-progress
+        Text $devicePrint.detail
+      Else
+        Icon name=Printer size=33
+        Text "No tracked print on this device"
+        Text variant=caption "Start from a reviewed slice. Status appears here when the printer reports it."
+  Stack variant=device-controls
+    Row variant=panel-heading
+      Text "Control"
+      Spacer
+      If condition=$device
+        Button variant=print item=$device.config.id action=editPrinter "Printer settings"
+    Card variant=telemetry
+      Row variant=device-control-top
+        Stack variant=temperatures
+          Icon name=Thermometer size=20
+          Text $nozzleText
+          Divider
+          Icon name=PanelBottom size=20
+          Text $bedText
+          Divider
+          Text $deviceState
+        Stack variant=motion
+          Text "Y"
+          Row
+            Text "−X"
+            Button variant=home-motion disabled=true aria-label="Printer motion unavailable"
+              Icon name=House size=28
+            Text "X"
+          Text "−Y"
+        Stack variant=extruder
+          Button variant=secondary disabled=true aria-label="Extruder motion unavailable"
+            Icon name=ChevronUp size=22
+          Icon name=Printer size=35
+          Button variant=secondary disabled=true aria-label="Extruder motion unavailable"
+            Icon name=ChevronDown size=22
+          Text variant=caption "Extruder"
+      Text variant=caption "Motion and extrusion controls are unavailable through this connection."
+    Card variant=ams
+      Row variant=panel-heading
+        Text "Filament · AMS"
+        Spacer
+        Badge $trayCount
+      Grid columns=2 variant=trays
+        For each=$deviceTrays
+          Stack variant=tray
+            Icon name=Disc3 size=48
+            Text $item.key
+            Text $item.material
+            Text variant=caption $item.color
+      If condition=$noTrays
+        Text variant=muted "No live filament trays reported"
+      Text variant=caption "Filament mapping is confirmed in the print review."
+    If condition=$device
+      Card variant=device-diagnostics
+        Heading level=3 $device.config.name
+        Text $deviceDetail
+        For each=$device.diagnostics
+          Text variant=caption $item.message
+        Button variant=secondary item=$device.config.id action=editPrinter "Setup & diagnostics"
+    Else
+      Text variant=caption "Pair an A1 or A1 mini on your local network. Adding a device never starts a print."

@@ -1,0 +1,103 @@
+Page PrinterRail variant=printer-rail
+  Row variant=rail-heading
+    Icon name=Printer size=16
+    Text "Printer"
+    Spacer
+    Link href="#printers" aria-label="Manage printers"
+      Icon name=Settings2 size=16
+  Row variant=printer-cards
+    Stack variant=printer-card
+      Icon name=Printer size=49
+      Field label="Printer model"
+        Select name=model options=$modelOptions disabled=$hasTarget
+    Stack variant=plate-card
+      Icon name=Grid2X2 size=42
+      Field label="Build plate"
+        Select name=plate options=$plateOptions disabled=$hasTarget
+    Button variant=sync action=syncInfo aria-label="Sync info"
+      Icon name=RefreshCw size=30
+      Text "Sync info"
+  Stack variant=nozzle
+    Text variant=caption "Nozzle"
+    Row
+      Field label=Diameter variant=inline
+        Select name=nozzle options=$nozzleOptions
+      Text "Flow"
+      Badge "Standard"
+  Row variant=rail-heading
+    Icon name=Layers size=16
+    Text "Project Filaments"
+  Stack variant=rail-section
+    If condition=$engineReady
+      Field label="Filament 1" variant=inline
+        Select name=filament options=$filamentOptions disabled=$preserving
+    Else
+      Text variant=muted "Profiles available after engine setup"
+    Field label="Target printer" variant=inline
+      Select name=target options=$printerOptions
+    If condition=$nativeProject
+      Field label="Imported plate" variant=inline
+        Select name=nativePlate options=$nativePlates
+      Checkbox name=allPlates label="Show all plates" disabled=$overviewUnavailable
+      If condition=$overviewUnavailable
+        Text variant=caption "For projects with more than 9 plates, choose an imported plate above."
+      Checkbox name=preserveImported label="Keep imported settings, modifiers and painting"
+  Row variant=rail-heading
+    Icon name=SlidersHorizontal size=16
+    Text "Process"
+    Badge tone=success "Global"
+    Spacer
+    Checkbox name=advanced label=Advanced
+  Stack variant=profile
+    If condition=$engineReady
+      Select name=quality options=$processOptions disabled=$preserving aria-label=Quality
+    Else
+      Text "Native process profile"
+  Row variant=process-tabs
+    For each=$processTabs
+      Button variant=$item.variant item=$item.title action=setProcessTab aria-pressed=$item.active $item.title
+  Stack variant=process-fields
+    If condition=$qualityTab
+      Heading level=3 "Layer height"
+      Field label="Layer height" variant=setting unit=mm
+        Input name=layerHeight type=number step=0.01 min=0.08 max=0.28 disabled=$preserving
+    If condition=$strengthTab
+      Heading level=3 "Walls"
+      Field label="Wall loops" variant=setting
+        Input name=walls type=number min=1 max=20 disabled=$preserving
+      Heading level=3 "Sparse infill"
+      Field label="Sparse infill density" variant=setting unit="%"
+        Input name=infill type=number min=0 max=100 disabled=$preserving
+    If condition=$supportTab
+      Heading level=3 "Support"
+      Checkbox name=supports label="Enable support" disabled=$preserving
+    If condition=$othersTab
+      Heading level=3 "Bed adhesion"
+      Field label="Brim type" variant=setting
+        Select name=brim options=$brimOptions disabled=$preserving
+    For each=$processGroups
+      Heading level=3 $item.title
+      For each=$item.fields
+        Field label=$item.label variant=setting unit=$item.unit
+          If condition=$item.select
+            Select name=$item.name options=$item.options disabled=$preserving
+          Else
+            Input name=$item.name type=number min=$item.min max=$item.max step=$item.step disabled=$preserving placeholder="Profile"
+    If condition=$preserving
+      Text variant=caption "Using the imported project’s settings and painting. Clear Keep imported settings to use the controls above."
+    If condition=$hasObjects
+      Button variant=secondary action=saveSettings "Apply settings"
+    If condition=$engineNeeded
+      Stack variant=engine
+        Heading level=3 "One-time slicing engine setup"
+        Text $engine.message
+        Text variant=caption $engineProgress
+        Section id=engine-progress
+        Text variant=caption "474 MB download · Models are kept while setup runs."
+        If condition=$owner
+          Button action=installEngine disabled=$engine.busy "Install slicing engine"
+          If condition=$engine.busy
+            Button variant=secondary action=cancelEngine cancel=true "Cancel setup"
+        Else
+          Text "Ask the Workspace owner to finish engine setup."
+    Text variant=caption $sliceHint

@@ -134,6 +134,9 @@ func (a *App) createProject(w http.ResponseWriter, r *http.Request) {
 	apphost.JSON(w, 201, p)
 }
 func (a *App) validateSettings(user string, s *Settings) error {
+	if e := engine.ValidateProcess(s.Process); e != nil {
+		return e
+	}
 	if s.Model != "A1" && s.Model != "A1 mini" || s.Nozzle != "0.4" {
 		return errors.New("Select a supported A1/A1 mini0.4mm profile")
 	}

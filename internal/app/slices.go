@@ -265,6 +265,9 @@ func (a *App) runNextSlice(ctx context.Context) {
 	}
 	override("enable_support", support)
 	override("brim_type", s.Settings.Brim)
+	for key, value := range s.Settings.Process {
+		override(key, value)
+	}
 	var objects []model.Object
 	for _, instance := range p.Objects {
 		m, e := a.getModel(user, instance.ModelID)

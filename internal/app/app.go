@@ -45,21 +45,22 @@ type Device struct {
 	Diagnostics []printer.Diagnostic
 }
 type Settings struct {
-	PrinterID        string          `json:"printerID"`
-	PrinterRevision  int             `json:"printerRevision"`
-	Model            string          `json:"model"`
-	Nozzle           string          `json:"nozzle"`
-	Plate            string          `json:"plate"`
-	Quality          string          `json:"quality"`
-	Filaments        []string        `json:"filaments"`
-	NativePlate      int             `json:"nativePlate"`
-	PreserveImported bool            `json:"preserveImported"`
-	LayerHeight      float64         `json:"layerHeight"`
-	Infill           int             `json:"infill"`
-	Walls            int             `json:"walls"`
-	Supports         bool            `json:"supports"`
-	Brim             string          `json:"brim"`
-	Overrides        map[string]bool `json:"overrides"`
+	Process          map[string]string `json:"process,omitempty"`
+	PrinterID        string            `json:"printerID"`
+	PrinterRevision  int               `json:"printerRevision"`
+	Model            string            `json:"model"`
+	Nozzle           string            `json:"nozzle"`
+	Plate            string            `json:"plate"`
+	Quality          string            `json:"quality"`
+	Filaments        []string          `json:"filaments"`
+	NativePlate      int               `json:"nativePlate"`
+	PreserveImported bool              `json:"preserveImported"`
+	LayerHeight      float64           `json:"layerHeight"`
+	Infill           int               `json:"infill"`
+	Walls            int               `json:"walls"`
+	Supports         bool              `json:"supports"`
+	Brim             string            `json:"brim"`
+	Overrides        map[string]bool   `json:"overrides"`
 }
 type Instance struct {
 	ID        string `json:"id"`
@@ -188,7 +189,20 @@ func (a *App) profiles(w http.ResponseWriter, r *http.Request) {
 		a.problem(w, e)
 		return
 	}
-	apphost.JSON(w, 200, map[string]any{"machine": m, "process": p.Compatible("process", m.Name), "filament": p.Compatible("filament", m.Name), "defaultProcess": engine.Text(m.Values["default_print_profile"]), "defaultFilament": engine.Text(m.Values["default_filament_profile"])})
+	quality := r.URL.Query().Get("quality")
+	if quality == "" {
+		quality = engine.Text(m.Values["default_print_profile"])
+	}
+	values, e := p.CompatibleValues("process", quality, m.Name)
+	if e != nil {
+		quality = engine.Text(m.Values["default_print_profile"])
+		values, e = p.CompatibleValues("process", quality, m.Name)
+		if e != nil {
+			a.problem(w, e)
+			return
+		}
+	}
+	apphost.JSON(w, 200, map[string]any{"values": values, "quality": quality, "machine": m, "process": p.Compatible("process", m.Name), "filament": p.Compatible("filament", m.Name), "defaultProcess": engine.Text(m.Values["default_print_profile"]), "defaultFilament": engine.Text(m.Values["default_filament_profile"])})
 }
 func (a *App) Run(ctx context.Context) error {
 	a.mu.Lock()

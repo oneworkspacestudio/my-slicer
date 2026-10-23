@@ -35,7 +35,7 @@ try{
  await page.getByRole('textbox',{name:'Email address',exact:true}).fill('fixture@example.test');
  await page.getByLabel('Password',{exact:true}).fill(password);
  await page.getByRole('button',{name:'Sign in',exact:true}).click();
- await page.getByRole('heading',{name:'Start with your model'}).waitFor();
+ await page.getByLabel('Add model',{exact:true}).waitFor();
  await waitUntil(async()=>!(await page.getByLabel('Add model',{exact:true}).isDisabled()));
  assert.equal((await api('/api/projects')).length,0);
  let box=await page.locator('.model-import').boundingBox();assert(box.y+box.height<768);
@@ -47,7 +47,7 @@ try{
  proof.addModelAboveFoldDesktopAndMobile=true;proof.noProjectCreatedOnVisit=true;
  await page.setViewportSize({width:1366,height:768});
  for(let n=0;n<4;n++){
-  await page.getByRole('link',{name:'Printers',exact:true}).click();
+  await page.getByRole('link',{name:'Device',exact:true}).click();
   await page.getByRole('button',{name:'Add printer',exact:true}).first().click();
   await page.getByRole('heading',{name:'Find these details on your printer'}).waitFor();
   assert.equal(await page.getByRole('dialog').count(),0);
@@ -102,34 +102,47 @@ try{
  await page.locator('canvas[data-models-ready="1"]').waitFor();await page.unroute('**/api/models/*/mesh*');
  proof.delayedPreviewFeedbackAndRetryWithoutUpload=true;
 
- await page.getByRole('button',{name:'Save project…'}).click();
+ await page.locator('.row--menubar').getByRole('button',{name:'Save project',exact:true}).click();
  await page.getByRole('dialog',{name:'Save project',exact:true}).waitFor();
  await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),0);
- await page.getByRole('button',{name:'Save project…'}).click();
+ await page.locator('.row--menubar').getByRole('button',{name:'Save project',exact:true}).click();
  await page.getByRole('textbox',{name:'Project name',exact:true}).fill('Reusable cube');
- await page.getByRole('button',{name:'Save project',exact:true}).click();
+ await page.getByRole('dialog',{name:'Save project',exact:true}).getByRole('button',{name:'Save project',exact:true}).click();
  await waitUntil(async()=>!(await api('/api/projects'))[0].draft);
  proof.optionalProjectSaveAndFallbackModal=true;
  await page.getByRole('button',{name:'New plate',exact:true}).click();
  assert.equal((await api('/api/projects')).length,1);
- await page.getByRole('link',{name:'Saved projects',exact:true}).click();
+ await page.getByRole('link',{name:'Project',exact:true}).click();
  await page.getByRole('button',{name:'Open',exact:true}).click();
- await page.getByRole('heading',{name:'Start with your model'}).waitFor();
+ await page.getByLabel('Add model',{exact:true}).waitFor();
  proof.namedProjectAndNewPlatePreserveModels=true;
  if(process.env.MYSLICER_TEST_ENGINE_ARCHIVE){
   await page.getByRole('button',{name:'Install slicing engine',exact:true}).click();
   await waitUntil(async()=>{const s=await api('/api/system');if(s.engine.phase==='failed')throw Error(s.engine.message);return s.engine.phase==='ready'},240000);
-  await waitUntil(async()=>!(await page.getByRole('button',{name:'Slice plate →',exact:true}).isDisabled()));
-  await page.getByRole('button',{name:'Slice plate →',exact:true}).click();
-  await page.getByRole('heading',{name:'Check before you print'}).waitFor();
+  await waitUntil(async()=>!(await page.getByRole('button',{name:'Slice plate',exact:true}).isDisabled()));
+  await page.getByRole('button',{name:'Slice plate',exact:true}).click();
+  await page.getByRole('heading',{name:'Slicing Result'}).waitFor();
   await waitUntil(async()=>{const slices=await api('/api/slices');if(slices[0]?.state==='failed')throw Error(slices[0].message);return slices[0]?.state==='ready'},120000);
-  await page.getByRole('button',{name:'Download sliced 3MF',exact:true}).waitFor();
+  await page.getByRole('button',{name:'Export sliced 3MF',exact:true}).waitFor();
   await page.screenshot({path:out+'/preview-real-slice-desktop.png',fullPage:true});
   const slice=(await api('/api/slices'))[0];assert(slice.result.layers>0);assert(slice.result.grams>0);assert(slice.result.seconds>0);
   proof.realVerifiedEngineAndSlice=true;proof.layers=slice.result.layers;
+  const slider=page.getByLabel('Visible toolpath percentage',{exact:true});await slider.fill('35');assert.equal(await slider.inputValue(),'35');
+  await page.getByLabel('Preview layer',{exact:true}).fill(String(Math.min(3,slice.result.layers)));
+  await page.getByRole('link',{name:'Device',exact:true}).click();await page.getByRole('heading',{name:'Camera unavailable'}).waitFor();
+  await page.screenshot({path:out+'/device-desktop.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.screenshot({path:out+'/device-mobile.png',fullPage:true});
+  await page.setViewportSize({width:1366,height:768});await page.getByRole('link',{name:'Calibration',exact:true}).first().click();await page.getByRole('heading',{name:'Printer calibration'}).waitFor();
+  await page.getByRole('link',{name:'Prepare',exact:true}).click();
+  await page.getByRole('button',{name:'Speed',exact:true}).click();await page.getByRole('heading',{name:'Other layers',exact:true}).waitFor();await page.getByLabel('Outer wall',{exact:true}).fill('60');
+  await page.getByRole('button',{name:'Apply settings',exact:true}).click();await waitUntil(async()=>(await api('/api/projects'))[0].settings.process?.outer_wall_speed==='60');
+  await page.reload();await page.getByRole('link',{name:'Project',exact:true}).click();await page.getByRole('button',{name:'Open',exact:true}).click();await page.getByRole('button',{name:'Speed',exact:true}).click();await page.getByRole('heading',{name:'Other layers',exact:true}).waitFor();assert.equal(await page.getByLabel('Outer wall',{exact:true}).inputValue(),'60');
+  await page.getByRole('button',{name:'Slice plate',exact:true}).click();await waitUntil(async()=>{const ss=await api('/api/slices');if(ss[0]?.state==='failed')throw Error(ss[0].message);return ss.length===2&&ss[0].state==='ready'},120000);
+  proof.studioProcessPersistsAndNativeEngineSlicesOverride=true;proof.deviceAndCalibrationAndSliders=true;
+
   const archive=await page.request.get('http://localhost:39126/api/slices/'+slice.id+'/archive');assert(archive.ok());
   const source=await archive.body();
-  await page.getByRole('link',{name:'← Back to Prepare',exact:true}).click();
+  await page.getByRole('link',{name:'Back to Prepare',exact:true}).click();
   await page.getByLabel('Add model',{exact:true}).setInputFiles({name:'native-cube.3mf',mimeType:'application/octet-stream',buffer:source});
   await waitUntil(async()=>{const plates=await api('/api/projects');return plates.length===2&&plates.some(v=>v.draft&&v.objects.length===1)});
   await page.getByRole('checkbox',{name:'Keep imported settings, modifiers and painting'}).waitFor();
@@ -138,8 +151,8 @@ try{
   await page.getByRole('heading',{name:'Your slice will appear here'}).waitFor();
   proof.native3MFOpensOwnPlateWithoutProjectAndClearsOldSlice=true;
   await page.getByRole('link',{name:'Go to Prepare',exact:true}).click();
-  await page.getByRole('button',{name:'Slice plate →',exact:true}).click();
-  await waitUntil(async()=>{const slices=await api('/api/slices');if(slices[0]?.state==='failed')throw Error(slices[0].message);return slices.length===2&&slices[0]?.state==='ready'},120000);
+  await page.getByRole('button',{name:'Slice plate',exact:true}).click();
+  await waitUntil(async()=>{const slices=await api('/api/slices');if(slices[0]?.state==='failed')throw Error(slices[0].message);return slices.length===3&&slices[0]?.state==='ready'},120000);
   proof.realNative3MFRoundTrip=true;
  }
  assert.equal(errors.length,0,errors.join('\n'));

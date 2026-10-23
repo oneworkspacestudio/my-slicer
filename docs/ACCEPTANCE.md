@@ -52,3 +52,40 @@ These are **unperformed unless a later release receipt explicitly records them**
 No automated test starts a physical printer. Unknown start outcomes never cause
 an automatic resend. See the Workspace release receipt for managed SSO/Drive,
 installer/update and remote route validation, reported separately from hardware.
+
+
+## Studio UI revision — preview.5
+
+The browser shell and Prepare/Preview/Device panels follow the supplied Studio
+references. This is a browser implementation with My Slicer identity, not a claim
+of full Bambu Studio feature parity. Unsupported camera, jogging, extrusion and
+physical calibration commands stay unavailable. Current A1/A1 mini 0.4 mm profile
+limits, pairing/trust checks and explicit physical print confirmation remain.
+
+New process overrides use an explicit server whitelist. Unknown native keys,
+G-code/script fields, invalid enum values, non-finite values and out-of-range or
+fractional layer counts are rejected before saving. A failed save retains the
+previous usable project. Existing projects without the additive process map load
+unchanged. Preserved native 3MF settings take precedence over the process rail.
+
+Preview requests at most 50 actual layers and falls back to a single layer when
+the existing 250,000-segment response limit is reached. The translucent mesh is
+context, not a fabricated toolpath. Native multi-plate overview fetches real meshes
+per imported plate; exported/sliced source archives remain intact.
+
+Multi-plate overview supports up to 9 imported plates together. Larger projects
+use the imported plate selector to keep mesh memory bounded.
+
+
+Final Windows candidate acceptance passed on2026-10-23: Go tests/vet, generated
+AUI/TypeScript build, native plate-origin regression and the full opt-in browser
+workflow. A verified pinned engine performed its A1/A1 mini setup validation,
+then real slicing, a persisted outer-wall speed override slice and native3MF
+round trip. Desktop/390px phone layout, real sliders, Device/Calibration routes,
+printer validation/trust page, draft recovery and delayed/failed mesh retry passed.
+Browser errors:0. No owner data fixture, hardware connection or physical print.
+
+[Native Prepare](screenshots/slicer5-prepare-desktop.png) ·
+[Native Preview](screenshots/slicer5-preview-desktop.png) ·
+[Native Device](screenshots/slicer5-device-desktop.png) ·
+[Native Device on phone](screenshots/slicer5-device-phone.png).

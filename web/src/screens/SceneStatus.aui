@@ -1,4 +1,4 @@
-Page SceneStatus
+Page SceneStatus variant=scene-status
   If condition=$loading
     Alert
       Stack gap=xs

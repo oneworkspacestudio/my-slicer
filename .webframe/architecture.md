@@ -33,3 +33,20 @@ Draft status is an additive JSON field; absent means an existing saved project.
 The browser owns only current controls, unsaved form fields, selection and dialog
 state. Access codes never enter local/session storage. Leaving printer setup clears
 them. Missing/unknown connection state stays distinct from connected/idle.
+
+
+```mermaid
+flowchart LR
+ Prepare["Prepare: models + process rail"] -->|Slice plate| Preview["Preview: real layers + result"]
+ Preview -->|Print plate: human review| Confirm["Confirm physical print"]
+ Prepare --> Device["Device: saved printers + real telemetry"]
+ Device --> Setup["Printer setup: details, trust, test"]
+ Prepare --> Project["Project: saved projects and activity"]
+ Prepare --> Calibration["Calibration: engine checks and printer guidance"]
+```
+
+Top navigation owns only route changes; project/revision and profile selection stay
+in Product. AUI owns UI trees. Scene owns disposable WebGL resources and bounded mesh
+cache. Server validates process overrides against a fixed native-key schema; no
+scripts, commands or arbitrary slicer keys. Device uses existing pairing/session
+authorization and real report fields. Printing requires existing explicit review.
