@@ -2,11 +2,36 @@ package model
 
 import (
 	"archive/zip"
+	"crypto/sha256"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
+
+func TestNativeProjectExtraTemperatureEntriesAreNotMissing(t *testing.T) {
+	settings := map[string]any{"printer_model": "Bambu Lab P2S", "nozzle_diameter": []string{"0.4"}, "filament_settings_id": []string{"Matte", "Basic"}, "filament_type": []string{"PLA", "PLA"}, "nozzle_temperature": []string{"220", "220", "220", "220"}, "filament_diameter": []string{"1.75", "1.75"}, "filament_density": []string{"1.32", "1.26"}}
+	raw, _ := json.Marshal(settings)
+	p := previewFixture(t, map[string]string{"3D/3dmodel.model": previewPart, "Metadata/project_settings.config": string(raw)})
+	before, _ := os.ReadFile(p)
+	info, err := InspectProject(p)
+	if err != nil || len(info.Filaments) != 2 || len(stringsOf(info.Settings["nozzle_temperature"])) != 4 {
+		t.Fatal("complete expanded temperature vector rejected or truncated", info, err)
+	}
+	after, _ := os.ReadFile(p)
+	if sha256.Sum256(before) != sha256.Sum256(after) {
+		t.Fatal("original project modified")
+	}
+	for _, values := range [][]string{{"220"}, {"220", ""}} {
+		settings["nozzle_temperature"] = values
+		raw, _ = json.Marshal(settings)
+		p = previewFixture(t, map[string]string{"3D/3dmodel.model": previewPart, "Metadata/project_settings.config": string(raw)})
+		if _, err := InspectProject(p); err == nil {
+			t.Fatal("genuinely missing/empty values accepted", values)
+		}
+	}
+}
 
 func TestArchiveReferenceAndScriptBoundaries(t *testing.T) {
 	for _, data := range []string{`<model><component path="../../outside.model"/></model>`, `<Relationships><Relationship Target="file:///C:/private"/></Relationships>`, `<config><metadata key="post_process" value="run.cmd"/></config>`, `<model><component path="/3D/%2e%2e/model"/></model>`} {

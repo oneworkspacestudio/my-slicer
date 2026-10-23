@@ -7,7 +7,7 @@ import {writeFile, mkdir, readFile} from 'node:fs/promises';
 import {randomBytes} from 'node:crypto';
 import assert from 'node:assert/strict';
 
-test('model-first Windows workflow preserves plates and printer setup', {timeout:420000,skip:!process.env.MYSLICER_TEST_EXE}, async()=>{
+test('model-first Windows workflow preserves plates and printer setup', {timeout:900000,skip:!process.env.MYSLICER_TEST_EXE}, async()=>{
 const repo=fileURLToPath(new URL('../../',import.meta.url));
 const out=path.resolve(process.env.MYSLICER_TEST_OUTPUT||path.join(repo,'test-results/workflow'));
 const parent=process.env.MYSLICER_TEST_ROOT||'';
@@ -21,7 +21,7 @@ delete env.MYSLICER_ENGINE_ARCHIVE;if(process.env.MYSLICER_TEST_ENGINE_ARCHIVE)e
 await mkdir(root,{recursive:true});await mkdir(out,{recursive:true});
 const child=spawn(process.env.MYSLICER_TEST_EXE,['--data',root+'/private','--listen','127.0.0.1:39126','--no-browser','--bootstrap-email','fixture@example.test'],{env,windowsHide:true,stdio:'ignore'});
 let browser,page;const errors=[],calls=[];let success=false;
-const proof={schema:1,syntheticOnly:true,ownerDataUsedAsFixture:false,physicalPrintSent:false,realHardwareContacted:false,nativeModalUnavailable:true};
+const proof={schema:1,syntheticOnly:!process.env.MYSLICER_TEST_PROJECT,syntheticAccount:true,userProvidedModelFixture:!!process.env.MYSLICER_TEST_PROJECT,ownerInstallationUsedAsFixture:false,ownerDataUsedAsFixture:false,physicalPrintSent:false,realHardwareContacted:false,nativeModalUnavailable:true};
 const api=async(path)=>page.evaluate(async path=>{const response=await fetch(path);if(!response.ok)throw Error('Read failed '+response.status);return response.json()},path);
 async function waitUntil(fn,timeout=30000){const start=Date.now();while(Date.now()-start<timeout){if(await fn())return;await new Promise(r=>setTimeout(r,500))}throw Error('Condition timed out');}
 try{
@@ -145,7 +145,7 @@ try{
   await page.getByRole('link',{name:'Back to Prepare',exact:true}).click();
   await page.getByLabel('Add model',{exact:true}).setInputFiles({name:'native-cube.3mf',mimeType:'application/octet-stream',buffer:source});
   await waitUntil(async()=>{const plates=await api('/api/projects');return plates.length===2&&plates.some(v=>v.draft&&v.objects.length===1)});
-  await page.getByRole('checkbox',{name:'Keep imported settings, modifiers and painting'}).waitFor();
+  await page.getByRole('checkbox',{name:'Keep imported print settings'}).waitFor();
   await page.locator('canvas[data-models-ready="1"]').waitFor();proof.native3MFGeometryBeforeSlicing=true;
   await page.getByRole('link',{name:'Preview',exact:true}).click();
   await page.getByRole('heading',{name:'Your slice will appear here'}).waitFor();
@@ -154,6 +154,38 @@ try{
   await page.getByRole('button',{name:'Slice plate',exact:true}).click();
   await waitUntil(async()=>{const slices=await api('/api/slices');if(slices[0]?.state==='failed')throw Error(slices[0].message);return slices.length===3&&slices[0]?.state==='ready'},120000);
   proof.realNative3MFRoundTrip=true;
+  if(process.env.MYSLICER_TEST_PROJECT){
+   await page.getByRole('link',{name:'Back to Prepare',exact:true}).click();
+   const bytes=await readFile(process.env.MYSLICER_TEST_PROJECT);
+   await page.getByLabel('Add model',{exact:true}).setInputFiles({name:'two-material-import.3mf',mimeType:'application/octet-stream',buffer:bytes});
+   await waitUntil(async()=>{const ps=await api('/api/projects');return ps.some(v=>v.draft&&v.settings.filaments.length===2&&!v.settings.preserveImported)},60000);
+   await page.locator('canvas[data-models-ready]:not([data-models-ready="0"])').waitFor({timeout:60000});
+   await page.getByLabel('Filament 2',{exact:true}).waitFor();
+   assert.equal(await page.getByLabel('Filament 1',{exact:true}).inputValue(),'');
+   assert.equal(await page.getByLabel('Filament 2',{exact:true}).inputValue(),'');
+   assert.equal(await page.getByRole('button',{name:'Slice plate',exact:true}).isDisabled(),true);
+   assert.equal(await page.getByRole('checkbox',{name:'Keep imported print settings'}).isDisabled(),true);
+   const pr=(await api('/api/projects')).find(v=>v.draft&&v.settings.filaments.length===2);
+   const ms=await api('/api/models'),m=ms.find(v=>v.id===pr.objects[0].modelID);
+   const original=await page.request.get('http://localhost:39126/api/models/'+m.id+'/original');assert(original.ok());assert.deepEqual(await original.body(),bytes);
+   await page.getByLabel('Printer model',{exact:true}).selectOption('A1');
+   await waitUntil(async()=>await page.getByLabel('Filament 1',{exact:true}).locator('option[value="Bambu PLA Matte @BBL A1"]').count()>0);
+   await page.getByLabel('Filament 1',{exact:true}).selectOption('Bambu PLA Matte @BBL A1');
+   assert.equal(await page.getByRole('button',{name:'Slice plate',exact:true}).isDisabled(),true);
+   await page.getByLabel('Filament 2',{exact:true}).selectOption('Bambu PLA Basic @BBL A1');
+   await page.getByRole('button',{name:'Apply settings',exact:true}).click();
+   await page.reload();await page.getByLabel('Filament 2',{exact:true}).waitFor();
+   await waitUntil(async()=>await page.getByLabel('Filament 1',{exact:true}).locator('option[value="Bambu PLA Matte @BBL A1"]').count()>0);
+   assert.equal(await page.getByLabel('Filament 1',{exact:true}).inputValue(),'Bambu PLA Matte @BBL A1');
+   assert.equal(await page.getByLabel('Filament 2',{exact:true}).inputValue(),'Bambu PLA Basic @BBL A1');
+   await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+   await page.setViewportSize({width:1366,height:768});
+   await waitUntil(async()=>!(await page.getByRole('button',{name:'Slice plate',exact:true}).isDisabled()));
+   await page.getByRole('button',{name:'Slice plate',exact:true}).click();
+   await waitUntil(async()=>{const ss=await api('/api/slices');if(ss[0]?.state==='failed')throw Error(ss[0].message);return ss[0]?.state==='ready'&&ss[0].projectID===pr.id},480000);
+   const result=(await api('/api/slices'))[0];assert.equal(result.result.modelID,'N2S');assert.equal(result.result.filamentSlots,2);assert(result.result.layers>0);assert(result.result.previewSegments>0);
+   proof.expandedTemperatureProjectImported=true;proof.originalImportBytesUnchanged=true;proof.explicitTwoMaterialSelectionPersists=true;proof.noSingleMaterialFallback=true;proof.retargetedRealNativeSlice=true;proof.retargetedSlotCount=2;proof.retargetedLayers=result.result.layers;
+  }
  }
  assert.equal(errors.length,0,errors.join('\n'));
  assert.equal(calls.some(v=>v.endsWith('/probe')||v.endsWith('/test')||v.endsWith('/discover')||v.endsWith('/trust')||v.endsWith('/prints')),false);

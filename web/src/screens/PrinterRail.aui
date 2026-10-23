@@ -29,8 +29,12 @@ Page PrinterRail variant=printer-rail
     Text "Project Filaments"
   Stack variant=rail-section
     If condition=$engineReady
-      Field label="Filament 1" variant=inline
-        Select name=filament options=$filamentOptions disabled=$preserving
+      Stack
+        For each=$filamentSlots
+          Field label=$item.label variant=inline
+            Select name=$item.name options=$item.options disabled=$preserving
+          If condition=$nativeProject
+            Text variant=caption $item.sourceLabel
     Else
       Text variant=muted "Profiles available after engine setup"
     Field label="Target printer" variant=inline
@@ -41,7 +45,7 @@ Page PrinterRail variant=printer-rail
       Checkbox name=allPlates label="Show all plates" disabled=$overviewUnavailable
       If condition=$overviewUnavailable
         Text variant=caption "For projects with more than 9 plates, choose an imported plate above."
-      Checkbox name=preserveImported label="Keep imported settings, modifiers and painting"
+      Checkbox name=preserveImported label="Keep imported print settings" disabled=$cannotPreserve
   Row variant=rail-heading
     Icon name=SlidersHorizontal size=16
     Text "Process"

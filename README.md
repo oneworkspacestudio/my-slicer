@@ -9,7 +9,9 @@ Part of [One Workspace](https://github.com/oneworkspacestudio/one-workspace).
 Native Windows app, no Docker. Open it from the Workspace app launcher and use
 your existing MyAccounts session, or run `MySlicer.exe` independently.
 
-- Import STL and self-contained, supported Bambu 3MF projects.
+- Import STL and self-contained Bambu 3MF projects, including projects with
+  several colours. If a project was made for another printer, choose a matching
+  material for each filament before slicing for your A1 or A1 mini.
 - Move, rotate, scale, duplicate, arrange, reset and undo STL instances.
 - Slice A1 and A1 mini plates using the actual Bambu Studio engine and complete
   release-matched inherited profiles, with a verified 0.4 mm nozzle configuration.

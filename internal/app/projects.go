@@ -210,8 +210,8 @@ func (a *App) saveProject(user string, p Project, previous int) (Project, error)
 		if !found {
 			return p, errors.New("Select an existing plate from the native project")
 		}
-		if !p.Settings.PreserveImported && len(native.Import.Filaments) > 1 {
-			return p, errors.New("Retargeting a multi-material native project needs an explicit per-slot profile editor. Keep imported settings or re-export a compatible native project; no single-filament fallback is applied")
+		if !p.Settings.PreserveImported && len(native.Import.Filaments) > 0 && len(p.Settings.Filaments) != len(native.Import.Filaments) {
+			return p, fmt.Errorf("Choose a material for each of this project's %d filament slots in Prepare", len(native.Import.Filaments))
 		}
 		if p.Settings.PreserveImported {
 			if native.Import.Printer != "Bambu Lab "+p.Settings.Model || len(native.Import.Nozzles) != 1 || native.Import.Nozzles[0] != "0.4" {
@@ -396,8 +396,14 @@ func (a *App) uploadModel(w http.ResponseWriter, r *http.Request) {
 				p.Settings.Model = "A1 mini"
 			default:
 				p.Settings.PreserveImported = false
+				info.Notice = fmt.Sprintf("This project was made for %s. Choose your A1 or A1 mini and a matching material for each filament below before slicing. The original file, colours and model layout are kept.", info.Printer)
 			}
 			p.Settings.Filaments = info.Filaments
+			if !p.Settings.PreserveImported {
+				// Retargeting is explicit, slot for slot; do not silently map a
+				// multi-material project onto the previous single-filament choice.
+				p.Settings.Filaments = make([]string, len(info.Filaments))
+			}
 			if v, ok := info.Settings["layer_height"].(string); ok {
 				if n, e := strconv.ParseFloat(v, 64); e == nil {
 					p.Settings.LayerHeight = n

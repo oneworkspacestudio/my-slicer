@@ -178,8 +178,17 @@ func InspectProject(filename string) (ImportInfo, error) {
 			return out, errors.New("Native project filament settings are incomplete; export a complete Bambu project")
 		}
 		for _, key := range []string{"nozzle_temperature", "filament_diameter", "filament_density"} {
-			if len(stringsOf(out.Settings[key])) != len(out.Filaments) {
-				return out, fmt.Errorf("Native project is missing complete%s values for every filament; no generic fallback is used", key)
+			// Newer native projects can retain additional temperature entries.
+			// Completeness requires enough values, not exact vector equality.
+			// Never truncate or rewrite the original project settings here.
+			values := stringsOf(out.Settings[key])
+			if len(values) < len(out.Filaments) {
+				return out, errors.New("This project is missing some filament details. Save it again in the original slicer with its filament settings included, then reopen it here")
+			}
+			for _, value := range values {
+				if strings.TrimSpace(value) == "" {
+					return out, errors.New("This project has an empty filament setting. Choose its materials in the original slicer and save it again")
+				}
 			}
 		}
 	}

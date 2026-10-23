@@ -4,7 +4,11 @@
    Choose an STL or Bambu 3MF. There is no project form to complete first.
    The model appears on the plate before slicing. While it loads, a message shows
    what is happening. If the preview fails, choose **Retry model preview**.
-   Imported 3MF layouts are shown as saved; their original print settings are kept.
+   Imported 3MF layouts are shown as saved, and the original file is kept.
+   If it was made for another printer, choose your A1 or A1 mini and a material
+   for each numbered filament. Each colour keeps its own slot. Slice is enabled
+   once every material has been selected. Compatible projects can keep their
+   original print settings.
 2. Choose your printer model, material and quality. Add or arrange the objects on
    the plate. Use the move/rotate/scale toolbar button for transforms. Process settings are
    grouped under Quality, Strength, Speed, Support and Others in the left rail.

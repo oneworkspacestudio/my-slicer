@@ -13,6 +13,10 @@ read-only previews on demand. Selected native plate filters saved build instance
 Imported state also shows object list and compact arrange/duplicate/remove/undo actions. Numeric
 transforms and advanced slice settings expand on demand. The settings rail shows
 model/printer, material and quality, with Slice plate as its primary action.
+Show one named material selector for every imported filament slot. Projects from
+another printer open with all source colours and layout retained, a clear source
+printer notice and empty material selections. Slice stays disabled until matching
+profiles are loaded and every slot is chosen. Retargeting never collapses slots.
 Engine missing/downloading/failed states appear in the rail without pushing import
 below the plate. Import failure keeps the current plate. Slicing navigates to
 Preview. Save project opens the optional naming state; New plate preserves previous

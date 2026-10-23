@@ -17,7 +17,7 @@
       "title": "Prepare your print",
       "route": "/",
       "file": "prepare.html",
-      "purpose": "Prepare your print with clear empty, loading and recovery states; see screens.md.",
+      "purpose": "Open models immediately; retain multi-colour slots and require an explicit matching material for each slot when changing printer.",
       "exits": [
         {
           "label": "Prepare",

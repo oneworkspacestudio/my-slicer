@@ -39,7 +39,16 @@ export function PrinterRail({ data, onAction }: { data: any; onAction: (name: st
       </Row>
       <Stack variant="rail-section">
         {data.engineReady ? (
-          <Field label="Filament 1" variant="inline"><Select name="filament" options={data.filamentOptions} disabled={data.preserving} /></Field>
+          <Stack>
+            {data.filamentSlots.map((item, i) => (
+              <Fragment key={i}>
+                <Field label={item.label} variant="inline"><Select name={item.name} options={item.options} disabled={data.preserving} /></Field>
+                {data.nativeProject && (
+                  <Text variant="caption">{item.sourceLabel}</Text>
+                )}
+              </Fragment>
+            ))}
+          </Stack>
         ) : (
           <Text variant="muted">Profiles available after engine setup</Text>
         )}
@@ -51,7 +60,7 @@ export function PrinterRail({ data, onAction }: { data: any; onAction: (name: st
             {data.overviewUnavailable && (
               <Text variant="caption">For projects with more than 9 plates, choose an imported plate above.</Text>
             )}
-            <Checkbox name="preserveImported" label="Keep imported settings, modifiers and painting" />
+            <Checkbox name="preserveImported" label="Keep imported print settings" disabled={data.cannotPreserve} />
           </>
         )}
       </Stack>

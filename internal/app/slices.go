@@ -128,7 +128,11 @@ func (a *App) createSlice(w http.ResponseWriter, r *http.Request) {
 			apphost.Problem(w, 400, "Select a compatible filament profile; no generic fallback will be used")
 			return
 		}
-		for _, name := range p.Settings.Filaments {
+		for slot, name := range p.Settings.Filaments {
+			if strings.TrimSpace(name) == "" {
+				apphost.Problem(w, 400, fmt.Sprintf("Choose a material for Filament %d in Prepare before slicing", slot+1))
+				return
+			}
 			if _, e = profiles.CompatibleValues("filament", name, machine.Name); e != nil {
 				a.problem(w, e)
 				return
