@@ -57,3 +57,13 @@ guidance. Physical calibration is performed on the printer’s screen.
 
 Multi-plate overview supports up to 9 imported plates together. Larger projects
 use the imported plate selector to keep mesh memory bounded.
+
+If slicing cannot finish, your model stays on the plate. The message identifies
+the affected plate and suggests what to check. Choose **Return to Prepare** to
+adjust it and try again. Time, material and layer totals appear only after a
+successful slice.
+
+If you need help, choose **Download troubleshooting report** on the failed result
+and share the downloaded file. It contains print settings and engine warnings,
+without model files, printer pairing details or sign-in details. This also works
+when the problem happens on another computer.

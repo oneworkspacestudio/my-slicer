@@ -14,19 +14,19 @@ Page Preview variant=studio-workbench
           Spacer
           Text $sliceTitle
         Divider
-        Field label="Color scheme" variant=inline
-          Select name=feature options=$featureOptions
-        Row variant=result-columns
-          Text "Filament"
-          Spacer
-          Text "Total"
-        Row
-          Badge tone=success "1"
-          Text $filamentText
-        Divider
-        Heading level=3 "Time Estimation"
-        Text $timeText
-        Text $layerCount
+        If condition=$sliceReady
+          Field label="Color scheme" variant=inline
+            Select name=feature options=$featureOptions
+          Row variant=result-columns
+            Text "Filament"
+            Spacer
+            Text "Total"
+          Row
+            Text $filamentText
+          Divider
+          Heading level=3 "Time Estimation"
+          Text $timeText
+          Text $layerCount
         Text variant=caption $activeSlice.message
         Text variant=caption $sliceElapsed
         If condition=$slicing
@@ -41,7 +41,10 @@ Page Preview variant=studio-workbench
           If condition=$staleSlice
             Alert tone=warning $staleReason
         If condition=$sliceFailed
-          Alert tone=warning "Your model is kept. Check the settings on Prepare and slice again."
+          Alert tone=warning "Your model is kept. Return to Prepare to adjust the settings and try again."
+          Link href="#" variant=button "Return to Prepare"
+          Button variant=secondary action=downloadTroubleshooting "Download troubleshooting report"
+          Text variant=caption "Contains print settings and engine warnings. No model files or sign-in details."
       If condition=$sliceReady
         Stack variant=layer-slider
           Text $maxLayer

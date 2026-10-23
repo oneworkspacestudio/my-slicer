@@ -28,7 +28,10 @@ Entry: Slice plate or Preview navigation. Queued/processing shows actual status,
 elapsed time and Cancel. Ready shows actual paths on the plate, layer/feature
 controls, time/material estimates, Download and Review print. Changed settings or
 stale revisions explain return to Prepare and re-slice; missing printer links to
-Printers. Empty/error/cancelled shows a clear Prepare action. Print review opens a
+Printers. Empty/error/cancelled shows a clear Prepare action. Failed and pending
+results hide time, filament totals, feature controls and layer counts entirely.
+Failures identify the selected plate and offer specific recovery when the native
+engine supplies a warning; private model names and paths stay out of the message. Print review opens a
 confirmation state with physical checks, actual tray mapping and explicit Print
 now; cancelling preserves the slice. Never fabricate estimates.
 

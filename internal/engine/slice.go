@@ -131,16 +131,7 @@ func Slice(ctx context.Context, root, dir string, c SliceConfig) (SliceResult, e
 		if ctx.Err() != nil {
 			return result, ctx.Err()
 		}
-		var native struct {
-			Error string `json:"error_string"`
-		}
-		if b, e := os.ReadFile(filepath.Join(dir, "result.json")); e == nil {
-			_ = json.Unmarshal(b, &native)
-		}
-		if native.Error != "" {
-			return result, fmt.Errorf("Native slicing failed: %s", strings.ReplaceAll(native.Error, dir, "[slice folder]"))
-		}
-		return result, fmt.Errorf("Native slicing stopped (%v). Check the engine installation and Windows runtime libraries", runErr)
+		return result, sliceFailure(dir, c.Plate)
 	}
 	return InspectResult(dir, c.Plate)
 }

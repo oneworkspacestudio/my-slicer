@@ -116,6 +116,32 @@ try{
  await page.getByRole('button',{name:'Open',exact:true}).click();
  await page.getByLabel('Add model',{exact:true}).waitFor();
  proof.namedProjectAndNewPlatePreserveModels=true;
+ // Simulate a failed engine response in this isolated account. A failure has
+ // no result: never display undefined layers, fake material badges or estimates.
+ const failureProject=(await api('/api/projects'))[0];
+ const failure={id:'fixture-failed-slice',projectID:failureProject.id,revision:failureProject.revision,state:'failed',settings:failureProject.settings,message:'Plate 2: Some parts disappear between printed layers. Try a smaller layer height.',created:new Date().toISOString(),updated:new Date().toISOString()};
+ await page.route('**/api/slices',route=>route.request().method()==='GET'?route.fulfill({json:[failure]}):route.continue());
+ await page.getByRole('link',{name:'Preview',exact:true}).click();
+ await page.getByText(failure.message,{exact:true}).waitFor({timeout:20000});
+ assert.equal(await page.getByText('undefined layers',{exact:true}).count(),0);
+ assert.equal(await page.getByRole('heading',{name:'Time Estimation',exact:true}).count(),0);
+ assert.equal(await page.getByRole('button',{name:'Export sliced 3MF',exact:true}).count(),0);
+ await page.screenshot({path:out+'/preview-failed-desktop.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ await page.screenshot({path:out+'/preview-failed-mobile.png',fullPage:true});
+ await page.route('**/api/slices/fixture-failed-slice/troubleshooting',route=>route.fulfill({json:{schema:1,settings:failureProject.settings,native:{return_code:-100},modelFilesIncluded:false,signInDetailsIncluded:false}}));
+ const reportDownload=page.waitForEvent('download');
+ await page.getByRole('button',{name:'Download troubleshooting report',exact:true}).click();
+ const downloaded=await reportDownload;
+ assert.equal(downloaded.suggestedFilename(),'my-slicer-troubleshooting.json');
+ const report=JSON.parse(await readFile(await downloaded.path(),'utf8'));
+ assert.equal(report.native.return_code,-100);assert.equal(report.modelFilesIncluded,false);
+ await page.unroute('**/api/slices/fixture-failed-slice/troubleshooting');
+ await page.getByRole('link',{name:'Return to Prepare',exact:true}).click();
+ await page.getByLabel('Add model',{exact:true}).waitFor();
+ await page.unroute('**/api/slices');await page.setViewportSize({width:1366,height:768});
+ proof.failedSliceHasNoFabricatedEstimatesAndReturnsToPrepare=true;
+ proof.troubleshootingReportDownloads=true;
  if(process.env.MYSLICER_TEST_ENGINE_ARCHIVE){
   await page.getByRole('button',{name:'Install slicing engine',exact:true}).click();
   await waitUntil(async()=>{const s=await api('/api/system');if(s.engine.phase==='failed')throw Error(s.engine.message);return s.engine.phase==='ready'},240000);

@@ -1,5 +1,5 @@
 // Generated from screens/Preview.aui; edit the AUI source.
-import { Alert, Badge, Button, Card, Divider, Field, Heading, Icon, Input, Link, Page, Row, Section, Select, Spacer, Spinner, Stack, Text } from "@/components/ui"
+import { Alert, Button, Card, Divider, Field, Heading, Icon, Input, Link, Page, Row, Section, Select, Spacer, Spinner, Stack, Text } from "@/components/ui"
 
 export function Preview({ data, onAction }: { data: any; onAction: (name: string) => void }) {
   return (
@@ -22,20 +22,21 @@ export function Preview({ data, onAction }: { data: any; onAction: (name: string
                 <Text>{data.sliceTitle}</Text>
               </Row>
               <Divider />
-              <Field label="Color scheme" variant="inline"><Select name="feature" options={data.featureOptions} /></Field>
-              <Row variant="result-columns">
-                <Text>Filament</Text>
-                <Spacer />
-                <Text>Total</Text>
-              </Row>
-              <Row>
-                <Badge tone="success">1</Badge>
-                <Text>{data.filamentText}</Text>
-              </Row>
-              <Divider />
-              <Heading level={3}>Time Estimation</Heading>
-              <Text>{data.timeText}</Text>
-              <Text>{data.layerCount}</Text>
+              {data.sliceReady && (
+                <>
+                  <Field label="Color scheme" variant="inline"><Select name="feature" options={data.featureOptions} /></Field>
+                  <Row variant="result-columns">
+                    <Text>Filament</Text>
+                    <Spacer />
+                    <Text>Total</Text>
+                  </Row>
+                  <Row><Text>{data.filamentText}</Text></Row>
+                  <Divider />
+                  <Heading level={3}>Time Estimation</Heading>
+                  <Text>{data.timeText}</Text>
+                  <Text>{data.layerCount}</Text>
+                </>
+              )}
               <Text variant="caption">{data.activeSlice.message}</Text>
               <Text variant="caption">{data.sliceElapsed}</Text>
               {data.slicing && (
@@ -58,7 +59,12 @@ export function Preview({ data, onAction }: { data: any; onAction: (name: string
                 </>
               )}
               {data.sliceFailed && (
-                <Alert tone="warning">Your model is kept. Check the settings on Prepare and slice again.</Alert>
+                <>
+                  <Alert tone="warning">Your model is kept. Return to Prepare to adjust the settings and try again.</Alert>
+                  <Link href="#" variant="button">Return to Prepare</Link>
+                  <Button variant="secondary" onClick={() => onAction("downloadTroubleshooting")}>Download troubleshooting report</Button>
+                  <Text variant="caption">Contains print settings and engine warnings. No model files or sign-in details.</Text>
+                </>
               )}
             </Card>
             {data.sliceReady && (

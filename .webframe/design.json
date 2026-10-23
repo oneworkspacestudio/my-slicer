@@ -76,7 +76,8 @@
           "label": "Calibration",
           "target": "calibration"
         }
-      ]
+      ],
+      "failureBehavior": "Show selected plate and actionable engine warning; no estimates, feature controls, layer counts or export without a successful result. Return to Prepare keeps model."
     },
     {
       "id": "printers",

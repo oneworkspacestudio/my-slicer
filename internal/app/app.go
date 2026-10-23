@@ -131,6 +131,7 @@ CREATE TABLE slicer_drive(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,kind TEXT NO
 	m.HandleFunc("GET /api/slices", h.Require(a.slices))
 	m.HandleFunc("POST /api/projects/{id}/slices", h.Require(a.createSlice))
 	m.HandleFunc("GET /api/slices/{id}", h.Require(a.sliceRoute))
+	m.HandleFunc("GET /api/slices/{id}/troubleshooting", h.Require(a.sliceTroubleshooting))
 	m.HandleFunc("DELETE /api/slices/{id}", h.Require(a.deleteSlice))
 	m.HandleFunc("POST /api/slices/{id}/cancel", h.Require(a.cancelSliceRoute))
 	m.HandleFunc("GET /api/slices/{id}/preview", h.Require(a.preview))
