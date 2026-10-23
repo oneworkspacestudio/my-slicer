@@ -89,3 +89,20 @@ Browser errors:0. No owner data fixture, hardware connection or physical print.
 [Native Preview](screenshots/slicer5-preview-desktop.png) ·
 [Native Device](screenshots/slicer5-device-desktop.png) ·
 [Native Device on phone](screenshots/slicer5-device-phone.png).
+
+Managed delivery uses [preview.5.2 packaging](https://github.com/oneworkspacestudio/my-slicer/releases/tag/v0.1.0-preview.5.2).
+The native application remains preview.5; the metadata revision corrects the
+managed manifest without changing the tested executable. The final manifest was
+generated with Workspace's publisher (schema2, integration3, minimum manager72)
+and contains exactly the four installed Slicer package IDs.
+
+On2026-10-23 the protected Slicer-only offline updater installed the release on
+Workspace73. Anonymous GitHub checks had hit rate limits, so the supported
+offline path used the verified public Workspace73 bundle and published Slicer
+payloads. Installed executable SHA256 equals the browser-tested candidate:
+`5e62a9ece380ea84f74a4c69e26d99d924661841e5aaced2f6fea2907aaa33e4`.
+All four Slicer payload hashes and its health/version check passed. Other app
+contracts/package hashes, identities, locations, ports and selection matched
+the verified pre-update backup. Restart exposed a separate Social3 migration
+bug; its executable still matched its existing published package. That app's
+own task is coordinating its restart repair while preserving its data.
