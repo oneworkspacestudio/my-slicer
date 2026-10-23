@@ -100,3 +100,19 @@ The authorized coordinating Social task is preparing a regression-tested release
 and protected repair; it has been explicitly told that Slicer's native updater
 exited and the window is available. Do not edit or downgrade owner Social data.
 Final suite-health verification remains pending that repair.
+
+## Final coordinated verification
+
+The pending repair is now resolved. The Social task released and installed
+preview.4 through its normal protected updater, with a same-data restart
+regression test. A separate authorized task subsequently installed Workspace74
+and Mail18. These later version changes are acknowledged; they were not made
+by the Slicer-only transaction.
+
+Independent final checks on2026-10-23 confirmed Workspace74 journal complete,
+all25 managed services running, Social4 healthy and Slicer5 healthy. Installed
+Slicer EXE still matches the exact tested/public SHA256 above. The sanitized
+tooling owner-final-verification.json binds the initial Slicer install receipt
+and coordinating Social delivery receipt by hash. The initial receipt's Social
+warning describes the intermediate state; this final receipt supersedes that
+health finding. No further Slicer installation or repair is required.

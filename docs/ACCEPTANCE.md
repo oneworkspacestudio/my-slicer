@@ -106,3 +106,10 @@ contracts/package hashes, identities, locations, ports and selection matched
 the verified pre-update backup. Restart exposed a separate Social3 migration
 bug; its executable still matched its existing published package. That app's
 own task is coordinating its restart repair while preserving its data.
+
+That separate Social repair is complete: preview.4 passed its restart test and
+protected installation. After a subsequent authorized Workspace74/Mail18 update,
+independent final checks confirmed all25 managed services running, Social4 and
+Slicer5 healthy, and a complete update journal. Slicer's installed executable
+still matches the tested release hash above. The intermediate Social warning is
+resolved; no Slicer reinstall was needed.
