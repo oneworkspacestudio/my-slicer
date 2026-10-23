@@ -32,5 +32,28 @@ supplied model only, never owner data. Don't publish supplied model/geometry or
 its screenshots. Native empty-layer test is opt-in with named fixture root.
 Tool artifacts: slicer-failure-20261024 on task tools drive (name differs from
 actual23October date), NTFS my-slicer-failure-20261024. User Bambu Studio windows
-must remain untouched. Report download browser test and release/install receipts
-will be reconciled after completion; no delivery claimed yet.
+must remain untouched. Report download browser test passed with an actual JSON download and correct
+filename. Ownership/privacy and real native failure/recovery tests passed.
+
+Delivered immutable v0.1.0-preview.7, source 2b2040df80efe1d8120eb0b7abc77f4c9ccefc62,
+main and branch pushed. All12 published asset hashes/sizes verified; exact tested
+native candidate equals published and installed executable. Native current
+Workspace74 publisher/SelectUpdates scope test passed against staged and actual
+public metadata; only four owned Slicer package contracts selected.
+
+Normal protected Slicer-only installer actually exited0 after consistent backup,
+startup checks and rollback retention/cleanup. Workspace74, Social4 and all other
+app contracts/bytes, owner identity, paths, ports, selection and autostart retained.
+All25 local/public services healthy; installed frontend and worker hashes match.
+Latest verified rollback retained, stopped named NTFS fixture cache cleaned with
+resolved path/reparse/process checks. Sanitized delivery proof is committed under
+docs/evidence/slice-failure-20261023.json; task tool receipts retain operational
+details. No supplied model source/images published, no printer hardware contacted.
+
+Remaining user issue: the failure occurred on another PC. It has not been remotely
+updated or its exact failed configuration reproduced. User should update My Slicer
+there through Workspace Check for updates, retry, then attach Download
+troubleshooting report if still failing. Read the actual selected settings/native
+warning before making another slicing change. Do not equate the verified synthetic
+empty-layer recovery or local supplied-file successes with resolving that PC.
+No local publication/installation work remains for version7.

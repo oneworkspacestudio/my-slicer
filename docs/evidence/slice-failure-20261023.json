@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "workspace": "0.3.0-preview.74",
+  "slicer": "0.1.0-preview.7",
+  "sourceCommit": "2b2040df80efe1d8120eb0b7abc77f4c9ccefc62",
+  "release": "https://github.com/oneworkspacestudio/my-slicer/releases/tag/v0.1.0-preview.7",
+  "slicerSHA256": "3105d89c75c875200c19498c372eaa0d668ce9e6c1790bba690adc7d036ae3a6",
+  "exactTestedPublishedExecutableInstalled": true,
+  "normalBackedUpAppOnlyUpdater": true,
+  "nativeUpdaterExitCode": 0,
+  "otherAppContractsAndPackageHashesUnchanged": true,
+  "managerAndSocialBytesPreserved": true,
+  "identityPathsPortsSelectionAutostartPreserved": true,
+  "allAppsHealthy": true,
+  "healthyServiceCount": 25,
+  "rollbackManifestVerified": true,
+  "rollbackManifestSHA256": "545637bfc0ae47ee4accb5bbcf9462a87fbd9554a5d004857d0ae8f575c525a3",
+  "ownerInstallationUsedAsFixture": false,
+  "physicalPrintSent": false,
+  "servedFrontendAndWorkerBytesMatchTestedBuild": [
+    {
+      "asset": "assets/index-DoYafFUz.js",
+      "sha256": "d57b9aeef3580e7c966404dfbb14ac068854a3631452cafdf2ea6bf5fe09bda4"
+    },
+    {
+      "asset": "assets/index-p5_0RyDB.css",
+      "sha256": "51805b52486c218609cc2816b01d49acf79e3e5141af702dde7d8ee6322bbcf6"
+    },
+    {
+      "asset": "assets/mesh.worker-DgOQaHIK.js",
+      "sha256": "78c0550d8cdef56f4168da1b9997b6f49a555d11d4442fa736bb08f10405990c"
+    }
+  ],
+  "publicAndLocalServicesHealthy": true,
+  "testPreviewsStoppedAndNamedCacheRemoved": true,
+  "userModelSourceOrImagesPublished": false,
+  "physicalPrinterContactedByAcceptance": false,
+  "realReportedModelSliceTarget": "A1",
+  "realReportedModelFilamentSlots": 2,
+  "realReportedModelLayers": 75,
+  "desktopAndPhoneLayoutChecked": true,
+  "materialSelectionsSurviveReload": true,
+  "failedSliceUIHasNoInventedEstimates": true,
+  "troubleshootingDownloadBrowserTestPassed": true,
+  "realNativeEmptyLayerFailureRecoveryLayers": 29,
+  "otherPCSpecificFaultReproduced": false,
+  "otherPCRemotelyInstalled": false,
+  "otherPCNeedsUpdateAndFailureReport": true
+}
