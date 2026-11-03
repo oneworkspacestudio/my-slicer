@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "syntheticHistoricalRegistration": true,
+  "legacyFourPackageUpdate": true,
+  "controllerOnlyUpgrade": true,
+  "anonymousNormalPublicSlicerUpdate": true,
+  "workspace": "0.3.0-preview.114",
+  "slicer": "0.1.0-preview.8",
+  "triangles": 342782,
+  "identityAndSessionPreserved": true,
+  "projectsAndOriginalBytesPreserved": true,
+  "unrelatedAppsUnchanged": true,
+  "ownerInstallationUsed": false
+}

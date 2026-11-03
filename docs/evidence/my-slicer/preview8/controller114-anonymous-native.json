@@ -1,0 +1,10 @@
+{
+  "anonymousNativeChannelAndPayloads": true,
+  "legacyFourPackageRegistration": true,
+  "ownerInstallationUsed": false,
+  "passed": true,
+  "selectedDownloads": 3,
+  "slicer": "0.1.0-preview.8",
+  "unselectedAppContractsPreserved": true,
+  "workspace": "0.3.0-preview.114"
+}

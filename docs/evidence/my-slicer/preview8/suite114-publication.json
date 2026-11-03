@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "publicChannelVerified": true,
+  "everyPublishedAssetMatchesLocal": true,
+  "assetsVerified": 472,
+  "sourceCommit": "6593d1295a9291f5a396aaea5561e94a6f885b4c",
+  "url": "https://github.com/oneworkspacestudio/one-workspace/releases/tag/v0.3.0-preview.114",
+  "immutableRelease": true,
+  "signedAndroidVersion": "0.1.0-preview.13",
+  "githubActionsUsed": false
+}

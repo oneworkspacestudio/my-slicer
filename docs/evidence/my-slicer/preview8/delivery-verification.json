@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "sourceCommit": "5189d2a5fe39075b2504dfe146846b5f50971a60",
+  "release": "https://github.com/oneworkspacestudio/my-slicer/releases/tag/v0.1.0-preview.8",
+  "workspace": "0.3.0-preview.114",
+  "slicer": "0.1.0-preview.8",
+  "slicerSHA256": "a377e49f399d68e6318d986715eb1f594c44cc1d4775c90c0cb6c8e99e7b3dfd",
+  "normalAnonymousChannelSelectedControllerAndSlicerUpdate": true,
+  "nativeUpdaterExitCode": 0,
+  "exactTestedPublishedBytesInstalled": true,
+  "ownedPackagesVerified": 22,
+  "unrelatedPackageContractsAndBytesPreserved": 406,
+  "otherAppContractsPreserved": 36,
+  "publishedControllerBytesVerified": true,
+  "identityAndCredentialInvariantsPreserved": true,
+  "pathsPortsSelectionAutostartPreserved": true,
+  "allServicesHealthy": true,
+  "healthyServices": 36,
+  "preexistingFailures": [],
+  "rollbackManifestVerified": true,
+  "physicalPrinterContacted": false,
+  "ownerInstallationUsedAsFixture": false,
+  "workspaceRelease": "https://github.com/oneworkspacestudio/one-workspace/releases/tag/v0.3.0-preview.114",
+  "signedAndroidIncluded": true,
+  "legacyRegistrationUpgradeVerified": true,
+  "supportedWorkspace114FreshSetupVerified": true,
+  "servedFrontendAndWorkerMatchTestedBuild": [
+    {
+      "asset": "assets/index-lHbV_3W-.js",
+      "sha256": "58364c11ce59f1f1a2e73732443f28f8d8a247cce347627837cf785129fc2710"
+    },
+    {
+      "asset": "assets/index-p5_0RyDB.css",
+      "sha256": "51805b52486c218609cc2816b01d49acf79e3e5141af702dde7d8ee6322bbcf6"
+    },
+    {
+      "asset": "assets/mesh.worker-DgOQaHIK.js",
+      "sha256": "78c0550d8cdef56f4168da1b9997b6f49a555d11d4442fa736bb08f10405990c"
+    }
+  ],
+  "localAndPublicServicesHealthy": true,
+  "publicChannelAndAnonymousDownloadVerified": true,
+  "managedFreshSetupAndProtectedUpgradeVerified": true,
+  "fullModelTriangles": 342782,
+  "everyPreviewVertexVerified": true,
+  "sourceModelBytesPreserved": true,
+  "sourceModelOrImagesPublished": false,
+  "physicalPhoneOrPrinterTested": false,
+  "secondPCInstalled": false
+}

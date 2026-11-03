@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "supportedFreshSetup": true,
+  "workspace": "0.3.0-preview.114",
+  "slicer": "0.1.0-preview.8",
+  "eightPackages": true,
+  "triangles": 342782,
+  "originalBytesUnchanged": true,
+  "myAccountsSignInVerified": true,
+  "anonymousDenied": true,
+  "mobileLayout": true,
+  "ownerInstallationUsed": false,
+  "physicalPrinterContacted": false
+}
