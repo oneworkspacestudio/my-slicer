@@ -90,7 +90,7 @@ func stringInt(n int) string { b, _ := json.Marshal(n); return string(b) }
 func TestProjectOwnershipRevisionAndInvalidUpload(t *testing.T) {
 	f := setup(t)
 	p := f.project()
-	p = f.upload(p, model.Cube(10).Binary(0), "cube.stl")
+	p = f.upload(p, model.Cube(10).Binary(), "cube.stl")
 	if p.Revision != 2 || len(p.Objects) != 1 {
 		t.Fatal(p)
 	}
@@ -197,7 +197,7 @@ func TestRealNativeHTTPWorkflow(t *testing.T) {
 	}
 	for _, name := range []string{"A1", "A1 mini"} {
 		p := f.project()
-		p = f.upload(p, model.Cube(10).Binary(0), "cube.stl")
+		p = f.upload(p, model.Cube(10).Binary(), "cube.stl")
 		_, profiles, _ := f.a.Engine.Ready()
 		m, e := profiles.Machine(name)
 		if e != nil {

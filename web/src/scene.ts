@@ -3,11 +3,12 @@ import * as T from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {nativePlateOrigin,displayPlateOrigin} from './plate-layout';
 import {SceneStatus} from './generated/SceneStatus';
+import {MeshBufferCache} from './mesh-cache';
 
 const colors=['#00ae42','#78c77c','#188038','#f9ab00','#a142f4','#e8710a','#12b5cb','#d93025'];
 export function Scene({project,models,layer,feature,request,onSelect,uploading,overview=false,pathPercent=100,viewMode,viewToken}:any){
  const host=useRef<HTMLDivElement>(null),[error,setError]=useState(''),[loading,setLoading]=useState(''),[attempt,setAttempt]=useState(0);
- const cache=useRef(new Map<string,ArrayBuffer>());
+ const cache=useRef(new MeshBufferCache());
  const modelKey=(project.objects||[]).map((o:any)=>models.find((m:any)=>m.id===o.modelID)?.id||'pending').join(',');
  useEffect(()=>{const el=host.current!;let alive=true;let renderer:T.WebGLRenderer;
   try{renderer=new T.WebGLRenderer({antialias:true,alpha:false});}catch{setError('WebGL is unavailable. Enable hardware acceleration in your browser to inspect the plate. Native slicing and archive downloads remain available.');return}
@@ -34,8 +35,8 @@ export function Scene({project,models,layer,feature,request,onSelect,uploading,o
   if(layer){const groups=new Map<number,number[]>();for(const s of (layer.segments||[]).slice(0,Math.ceil((layer.segments?.length||0)*pathPercent/100))){if(feature!=='all'&&Number(feature)!==s[6])continue;const arr=groups.get(s[6])||[];arr.push(...s.slice(0,6));groups.set(s[6],arr)}for(const[k,arr]of groups){const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(arr,3));scene.add(new T.LineSegments(g,new T.LineBasicMaterial({color:colors[k%colors.length]})))}}
   for(const o of (project.objects||[]).flatMap((o:any)=>plates.map((plate:any,index:number)=>({...o,previewPlate:plate.index,shift:offset(index).sub(new T.Vector3(...nativePlateOrigin(Math.max(0,(nativeModel?.import?.plates||[]).findIndex((p:any)=>p.index===plate.index)),nativeModel?.import?.plates?.length||1,sourceWidth)))})))){const m=models.find((m:any)=>m.id===o.modelID);if(!m){setLoading('Preparing your model…');continue}
    pending++;setLoading('Loading '+m.name+'…');
-   const url='/api/models/'+m.id+'/mesh'+(m.kind==='3mf'?'?plate='+(o.previewPlate||project.settings.nativePlate||1):'');
-   const getBuffer=async()=>{const saved=cache.current.get(url);if(saved)return saved.slice(0);const blob:Blob=await request(url);const buffer=await blob.arrayBuffer();if(alive){if(cache.current.size>=8)cache.current.delete(cache.current.keys().next().value!);cache.current.set(url,buffer.slice(0))}return buffer};
+   const url='/api/models/'+m.id+'/mesh?surface=full-v2'+(m.kind==='3mf'?'&plate='+(o.previewPlate||project.settings.nativePlate||1):'');
+   const getBuffer=async()=>{const saved=cache.current.get(url);if(saved)return saved;const blob:Blob=await request(url);const buffer=await blob.arrayBuffer();if(alive)cache.current.set(url,buffer);return buffer};
    // A wire outline gives immediate spatial feedback while the real mesh loads.
    const lo=m.min,hi=m.max;let outline:T.Mesh|undefined;
    const place=(mesh:T.Object3D)=>{const t=o.transform;mesh.scale.setScalar(t.scale);mesh.rotation.order='ZYX';mesh.rotation.set(t.rx*Math.PI/180,t.ry*Math.PI/180,t.rz*Math.PI/180);mesh.position.set(t.x,t.y,t.z).add(o.shift||new T.Vector3())};
@@ -46,6 +47,7 @@ export function Scene({project,models,layer,feature,request,onSelect,uploading,o
     worker.onerror=()=>fail('The model preview could not be drawn. Try loading it again.');
     worker.onmessage=({data})=>{if(!alive)return;if(data.error){fail(data.error);return}
      const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.BufferAttribute(data.positions,3));geometry.setAttribute('normal',new T.BufferAttribute(data.normals,3));
+     renderer.domElement.dataset.modelTriangles=String(Number(renderer.domElement.dataset.modelTriangles||0)+data.positions.length/9);
      const mesh=new T.Mesh(geometry,new T.MeshStandardMaterial({color:layer?0x779081:0xc9ad99,roughness:.8,metalness:0,side:T.DoubleSide,transparent:!!layer,opacity:layer?.22:1,depthWrite:!layer,clippingPlanes:layer?[new T.Plane(new T.Vector3(0,0,-1),Number(layer.z)||0)]:[]}));place(mesh);mesh.userData.id=o.id;selectables.push(mesh);scene.add(mesh);
      if(outline){scene.remove(outline);outline.geometry.dispose();(outline.material as T.Material).dispose()}
      if(--pending===0){setLoading('');fit();renderer.domElement.dataset.modelsReady=String(selectables.length)}worker.terminate();

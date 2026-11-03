@@ -65,6 +65,9 @@ func (a *App) getModel(user, id string) (Model, error) {
 		return m, errMissing
 	}
 	e = json.Unmarshal([]byte(raw), &m)
+	if m.Kind == "stl" {
+		m.PreviewTriangles = m.Triangles
+	}
 	return m, e
 }
 func (a *App) projects(w http.ResponseWriter, r *http.Request) {
@@ -277,6 +280,9 @@ func (a *App) models(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if json.Unmarshal([]byte(raw), &m) == nil {
+			if m.Kind == "stl" {
+				m.PreviewTriangles = m.Triangles
+			}
 			out = append(out, m)
 		}
 	}
@@ -363,13 +369,8 @@ func (a *App) uploadModel(w http.ResponseWriter, r *http.Request) {
 		m.Min = mesh.Min
 		m.Max = mesh.Max
 		m.Triangles = len(mesh.Triangles)
-		stride := max(1, (m.Triangles+99999)/100000)
-		m.PreviewTriangles = (m.Triangles + stride - 1) / stride
-		if e = os.WriteFile(filepath.Join(dir, "mesh.stl"), mesh.Binary(0), 0600); e != nil {
-			a.problem(w, e)
-			return
-		}
-		if e = os.WriteFile(filepath.Join(dir, "preview.stl"), mesh.Binary(100000), 0600); e != nil {
+		m.PreviewTriangles = m.Triangles
+		if e = os.WriteFile(filepath.Join(dir, "mesh.stl"), mesh.Binary(), 0600); e != nil {
 			a.problem(w, e)
 			return
 		}
@@ -447,14 +448,16 @@ func (a *App) modelFile(w http.ResponseWriter, r *http.Request) {
 				apphost.Problem(w, 400, "Choose an imported plate to view")
 				return
 			}
-			file = fmt.Sprintf("preview-plate-%d.stl", plate)
+			// Old preview caches sampled disconnected facets. Regenerate them
+			// from the original archive, without changing source or print data.
+			file = fmt.Sprintf("preview-full-v2-plate-%d.stl", plate)
 			cached := filepath.Join(a.H.Config.Data, "models", m.ID, file)
 			a.storageMu.Lock()
 			if _, err = os.Stat(cached); os.IsNotExist(err) {
 				var mesh model.Mesh
 				mesh, err = model.PreviewProject(filepath.Join(a.H.Config.Data, "models", m.ID, "original.3mf"), plate)
 				if err == nil {
-					err = os.WriteFile(cached+".tmp", mesh.Binary(100000), 0600)
+					err = os.WriteFile(cached+".tmp", mesh.Binary(), 0600)
 					if err == nil {
 						err = os.Rename(cached+".tmp", cached)
 					}
@@ -467,9 +470,11 @@ func (a *App) modelFile(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if m.Kind == "stl" {
-			file = "preview.stl"
+			// Full centred geometry already exists for retained STL imports.
+			file = "mesh.stl"
 		}
 		w.Header().Set("Content-Type", "model/stl")
+		w.Header().Set("Cache-Control", "private, no-cache")
 	} else {
 		w.Header().Set("Content-Type", "application/octet-stream")
 		w.Header().Set("Content-Disposition", `attachment; filename="model.`+m.Kind+`"`)

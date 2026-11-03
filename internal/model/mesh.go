@@ -137,25 +137,22 @@ func (m Mesh) Centred() Mesh {
 	out.Min, out.Max, _ = Bounds(out.Triangles)
 	return out
 }
-func (m Mesh) Binary(previewLimit int) []byte {
-	stride := 1
-	if previewLimit > 0 && len(m.Triangles) > previewLimit {
-		stride = (len(m.Triangles) + previewLimit - 1) / previewLimit
-	}
-	count := (len(m.Triangles) + stride - 1) / stride
+
+// Binary preserves the complete surface. Selecting every nth triangle is not
+// mesh simplification: it opens holes throughout an otherwise valid solid.
+func (m Mesh) Binary() []byte {
+	count := len(m.Triangles)
 	b := make([]byte, 84+count*50)
 	copy(b, "My Slicer validated millimeter triangle mesh")
 	binary.LittleEndian.PutUint32(b[80:84], uint32(count))
-	n := 0
-	for i := 0; i < len(m.Triangles); i += stride {
-		offset := 84 + n*50 + 12
-		for _, v := range m.Triangles[i] {
+	for i, tri := range m.Triangles {
+		offset := 84 + i*50 + 12
+		for _, v := range tri {
 			for _, x := range v {
 				binary.LittleEndian.PutUint32(b[offset:offset+4], math.Float32bits(float32(x)))
 				offset += 4
 			}
 		}
-		n++
 	}
 	return b
 }

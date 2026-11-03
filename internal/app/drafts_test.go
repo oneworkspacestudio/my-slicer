@@ -21,7 +21,7 @@ func TestDraftPlateImportThenOptionalProjectSave(t *testing.T) {
 	if e := json.Unmarshal(w.Body.Bytes(), &plate); e != nil || !plate.Draft {
 		t.Fatal("Draft plate was not persisted", e)
 	}
-	plate = f.upload(plate, model.Cube(10).Binary(0), "cube.stl")
+	plate = f.upload(plate, model.Cube(10).Binary(), "cube.stl")
 	if !plate.Draft || len(plate.Objects) != 1 {
 		t.Fatal("Import must retain the recoverable unsaved plate", plate)
 	}

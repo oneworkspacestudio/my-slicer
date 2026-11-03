@@ -24,7 +24,7 @@ func TestRealMeshTransformsAndPrinterBounds(t *testing.T) {
 	if tr.Valid() {
 		t.Fatal("Nonfinite transform accepted")
 	}
-	roundtrip, e := ParseSTL(m.Binary(0))
+	roundtrip, e := ParseSTL(m.Binary())
 	if e != nil || len(roundtrip.Triangles) != 12 {
 		t.Fatal(e)
 	}

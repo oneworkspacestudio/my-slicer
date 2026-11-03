@@ -32,8 +32,9 @@ No broad claim is made for every desktop painting/modifier feature or third-part
 100 MiB uploads; 1.5 million STL triangles; 100 instances/plate; 100 saved projects
 and recent plates combined;
 2 GiB source uploads/account; five queued/active slices/account and 50 retained
-results. Browser meshes are decimated above 100,000 triangles, with full geometry
-used by the engine. Layer preview has explicit segment/range limits; complexity
+results. Model previews preserve every surface triangle within the supported
+model limits. Raw viewer buffers use a 64 MiB / eight-entry cache; oversized
+buffers are displayed without being retained in that cache. Layer preview has explicit segment/range limits; complexity
 overflow is reported rather than replaced by simulated toolpaths.
 
 ## Required physical and deployment checks

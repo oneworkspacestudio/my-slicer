@@ -21,7 +21,8 @@ delete env.MYSLICER_ENGINE_ARCHIVE;if(process.env.MYSLICER_TEST_ENGINE_ARCHIVE)e
 await mkdir(root,{recursive:true});await mkdir(out,{recursive:true});
 const child=spawn(process.env.MYSLICER_TEST_EXE,['--data',root+'/private','--listen','127.0.0.1:39126','--no-browser','--bootstrap-email','fixture@example.test'],{env,windowsHide:true,stdio:'ignore'});
 let browser,page;const errors=[],calls=[];let success=false;
-const proof={schema:1,syntheticOnly:!process.env.MYSLICER_TEST_PROJECT,syntheticAccount:true,userProvidedModelFixture:!!process.env.MYSLICER_TEST_PROJECT,ownerInstallationUsedAsFixture:false,ownerDataUsedAsFixture:false,physicalPrintSent:false,realHardwareContacted:false,nativeModalUnavailable:true};
+const userModel=!!(process.env.MYSLICER_TEST_PROJECT||process.env.MYSLICER_TEST_SURFACE_STL);
+const proof={schema:1,syntheticOnly:!userModel,syntheticAccount:true,userProvidedModelFixture:userModel,ownerInstallationUsedAsFixture:false,ownerDataUsedAsFixture:false,physicalPrintSent:false,realHardwareContacted:false,nativeModalUnavailable:true};
 const api=async(path)=>page.evaluate(async path=>{const response=await fetch(path);if(!response.ok)throw Error('Read failed '+response.status);return response.json()},path);
 async function waitUntil(fn,timeout=30000){const start=Date.now();while(Date.now()-start<timeout){if(await fn())return;await new Promise(r=>setTimeout(r,500))}throw Error('Condition timed out');}
 try{
@@ -212,6 +213,36 @@ try{
    const result=(await api('/api/slices'))[0];assert.equal(result.result.modelID,'N2S');assert.equal(result.result.filamentSlots,2);assert(result.result.layers>0);assert(result.result.previewSegments>0);
    proof.expandedTemperatureProjectImported=true;proof.originalImportBytesUnchanged=true;proof.explicitTwoMaterialSelectionPersists=true;proof.noSingleMaterialFallback=true;proof.retargetedRealNativeSlice=true;proof.retargetedSlotCount=2;proof.retargetedLayers=result.result.layers;
   }
+ }
+ if(process.env.MYSLICER_TEST_SURFACE_STL){
+  await page.getByRole('link',{name:'Prepare',exact:true}).click();
+  await page.getByRole('button',{name:'New plate',exact:true}).click();
+  const source=await readFile(process.env.MYSLICER_TEST_SURFACE_STL);
+  const count=source.readUInt32LE(80);assert.equal(source.length,84+count*50);assert(count>100000);
+  await page.getByLabel('Add model',{exact:true}).setInputFiles({name:'detailed-base.stl',mimeType:'application/octet-stream',buffer:source});
+  const canvas=page.locator('canvas[data-models-ready="1"]');await canvas.waitFor({timeout:60000});
+  assert.equal(Number(await canvas.getAttribute('data-model-triangles')),count);
+  const model=(await api('/api/models')).find(v=>v.name==='detailed-base.stl');
+  assert.equal(model.triangles,count);assert.equal(model.previewTriangles,count);
+  const response=await page.request.get('http://localhost:39126/api/models/'+model.id+'/mesh?surface=full-v2');assert(response.ok());
+  const surface=await response.body();assert.equal(surface.readUInt32LE(80),count);
+  const lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity];
+  for(let i=0;i<count;i++)for(let j=0;j<3;j++)for(let k=0;k<3;k++){const v=source.readFloatLE(84+i*50+12+j*12+k*4);lo[k]=Math.min(lo[k],v);hi[k]=Math.max(hi[k],v)}
+  const origin=[(lo[0]+hi[0])/2,(lo[1]+hi[1])/2,lo[2]];
+  for(let i=0;i<count;i++)for(let j=0;j<3;j++)for(let k=0;k<3;k++){
+   const offset=84+i*50+12+j*12+k*4;
+   assert.equal(surface.readFloatLE(offset),Math.fround(source.readFloatLE(offset)-origin[k]),'surface vertex changed');
+  }
+  const original=await page.request.get('http://localhost:39126/api/models/'+model.id+'/original');assert(original.ok());assert.deepEqual(await original.body(),source);
+  await page.waitForTimeout(300);await page.screenshot({path:out+'/detailed-surface-desktop.png',fullPage:true});
+  await canvas.hover();await page.mouse.wheel(0,-1500);await page.waitForTimeout(500);
+  await canvas.screenshot({path:out+'/detailed-surface-closeup.png'});
+  await page.reload();await canvas.waitFor({timeout:60000});assert.equal(Number(await canvas.getAttribute('data-model-triangles')),count);
+  await page.getByRole('button',{name:'Top view',exact:true}).click();await canvas.waitFor({timeout:60000});
+  await page.waitForTimeout(300);await page.screenshot({path:out+'/detailed-surface-top.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await page.screenshot({path:out+'/detailed-surface-mobile.png',fullPage:true});
+  proof.completeSuppliedSTLSurface=true;proof.surfaceTriangles=count;proof.everySurfaceVertexMatchesCenteredOriginal=true;proof.originalSTLBytesPreserved=true;proof.fullSurfaceSurvivesReload=true;
  }
  assert.equal(errors.length,0,errors.join('\n'));
  assert.equal(calls.some(v=>v.endsWith('/probe')||v.endsWith('/test')||v.endsWith('/discover')||v.endsWith('/trust')||v.endsWith('/prints')),false);
